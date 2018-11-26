@@ -1,5 +1,5 @@
 #!flask/bin/python
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, make_response
 import urllib
 import datetime
 import re
@@ -138,7 +138,13 @@ def GetTimetable(url):
 
 @app.route('/', methods=['POST'])
 def get_timetable():
+    if 'url' not in request.json:
+        abort(404)
     return jsonify(GetTimetable(request.json['url']))
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Missing Information'}), 404)
 
 if __name__ == '__main__':
     app.run(debug=True)
