@@ -51,83 +51,90 @@ def GetTimetable(url):
 
         daysClasses.append({ 'day': daysOfWeek[i], 'classes': classes})
 
-    #for cl in daysClasses[0]['classes']:
-    cl = daysClasses[2]['classes'][2]
-    parts = cl.findAll('td')
+    for i in range(len(daysClasses)):
+        day = daysClasses[i]
+        classes = []
+        if not day['classes']:
+            continue
 
-    classInfo = {
-        'activity': parts[0].text.strip(),
-        'module': {},
-        'type': parts[2].text.strip(),
-        'times': {
-            'start': parts[3].text.strip(),
-            'end': parts[4].text.strip()
-        },
-        'duration': parts[5].text.strip(),
-        'weeks': [],
-        'rooms': [],
-        'lecturers': parts[8].text.strip().split(';'),
-        'groups': []
-    }
+        for cl in day['classes']:
+            parts = cl.findAll('td')
 
-        # Module Info
-    moduleInfo = parts[1].text.split('-')
-    moduleCode = moduleInfo[0].strip()
+            classInfo = {
+                'activity': parts[0].text.strip(),
+                'module': {},
+                'type': parts[2].text.strip(),
+                'times': {
+                    'start': parts[3].text.strip(),
+                    'end': parts[4].text.strip()
+                },
+                'duration': parts[5].text.strip(),
+                'weeks': [],
+                'rooms': [],
+                'lecturers': parts[8].text.strip().split(';'),
+                'groups': []
+            }
 
-    if len(moduleInfo) == 2:
-        classInfo['module']['code'] = CheckModuleCode(moduleCode)
-        classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo)
-    else:
-        classInfo['module']['code'] = None
-        classInfo['module']['name'] = moduleCode
+                # Module Info
+            moduleInfo = parts[1].text.split('-')
+            moduleCode = moduleInfo[0].strip()
 
-        # Weeks
-    weeksInfo = parts[6].text.split(',')
+            if len(moduleInfo) == 2:
+                classInfo['module']['code'] = CheckModuleCode(moduleCode)
+                classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo)
+            else:
+                classInfo['module']['code'] = None
+                classInfo['module']['name'] = moduleCode
 
-    for wi in weeksInfo:
-        wi = wi.strip()
+                # Weeks
+            weeksInfo = parts[6].text.split(',')
 
-        if RangeOfWeeks(wi):
-            startAndEnd = wi.split('-')
-            classInfo['weeks'].append({ 'start': startAndEnd[0], 'end': startAndEnd[1] })
-        elif SolidWeek(wi):
-            classInfo['weeks'].append({ 'lone': wi })
+            for wi in weeksInfo:
+                wi = wi.strip()
 
-        # Room Info
-    if len(parts[7].text.strip()):
-        rooms = parts[7].text.split(';')
-        for room in rooms:
-            roomInfo = {}
+                if RangeOfWeeks(wi):
+                    startAndEnd = wi.split('-')
+                    classInfo['weeks'].append({ 'start': startAndEnd[0], 'end': startAndEnd[1] })
+                elif SolidWeek(wi):
+                    classInfo['weeks'].append({ 'lone': wi })
 
-            room = room.strip()
-            roomCode = room[0:5]
-            roomInfo['code'] = CheckRoomCode(roomCode)
+                # Room Info
+            if len(parts[7].text.strip()):
+                rooms = parts[7].text.split(';')
+                for room in rooms:
+                    roomInfo = {}
 
-            seats = re.findall(r'\([0-9]*\)', room)
-            if seats:
-                seats = seats[0].strip() if len(seats) == 1 else None
-                if (seats):
-                    seats = seats.replace('(', '').replace(')', '')
+                    room = room.strip()
+                    roomCode = room[0:5]
+                    roomInfo['code'] = CheckRoomCode(roomCode)
 
-                roomInfo['seats'] = CheckRoomSeats(seats)
+                    seats = re.findall(r'\([0-9]*\)', room)
+                    if seats:
+                        seats = seats[0].strip() if len(seats) == 1 else None
+                        if (seats):
+                            seats = seats.replace('(', '').replace(')', '')
 
-            roomInfo['type'] = re.split(r'\([0-9]*\)|[A-Z]\d{4} ?-', room)[1].strip()
+                        roomInfo['seats'] = CheckRoomSeats(seats)
 
-            classInfo['rooms'].append(roomInfo)
+                    roomInfo['type'] = re.split(r'\([0-9]*\)|[A-Z]\d{4} ?-', room)[1].strip()
 
-    if len(parts[9].text.strip()):
-        groups = parts[9].text.strip().split(';')
-        for i in range(len(groups)):
-            groupsInfo = groups[i].split('/')
-            if len(groupsInfo) == 5:
-                groups[i] = {
-                    'code': CheckCourseCode(groupsInfo[0].strip()),
-                    'year': CheckCourseYear(groupsInfo[2].strip())
-                }
+                    classInfo['rooms'].append(roomInfo)
 
-        classInfo['groups'] = groups
+            if len(parts[9].text.strip()):
+                groups = parts[9].text.strip().split(';')
+                for j in range(len(groups)):
+                    groupsInfo = groups[j].split('/')
+                    if len(groupsInfo) == 5:
+                        groups[j] = {
+                            'code': CheckCourseCode(groupsInfo[0].strip()),
+                            'year': CheckCourseYear(groupsInfo[2].strip())
+                        }
 
-    return classInfo
+                classInfo['groups'] = groups
+
+            classes.append(classInfo)
+        daysClasses[i]['classes'] = classes
+    return daysClasses
 
 @app.route('/', methods=['POST'])
 def get_timetable():
