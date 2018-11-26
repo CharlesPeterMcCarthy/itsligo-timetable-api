@@ -28,12 +28,11 @@ def CheckCourseCode(courseCode):
 def CheckCourseYear(courseYear):
     return courseYear[1] if re.match(r'Y\d', courseYear) else None
 
-def GetTimetable():
+def GetTimetable(url):
     startTime = datetime.datetime.strptime("09:00", "%H:%M")
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-    link = "http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=3-9;11-16&periods=3-20&template=student+set+textspreadsheet"
-    request = urllib.request.Request(link)
+    request = urllib.request.Request(url)
     opener = urllib.request.build_opener()
     response = opener.open(request)
 
@@ -53,7 +52,7 @@ def GetTimetable():
         daysClasses.append({ 'day': daysOfWeek[i], 'classes': classes})
 
     #for cl in daysClasses[0]['classes']:
-    cl = daysClasses[0]['classes'][0]
+    cl = daysClasses[2]['classes'][2]
     parts = cl.findAll('td')
 
     classInfo = {
@@ -66,19 +65,21 @@ def GetTimetable():
         },
         'duration': parts[5].text.strip(),
         'weeks': [],
-        'room': {},
+        'rooms': [],
         'lecturers': parts[8].text.strip().split(';'),
         'groups': []
     }
 
         # Module Info
     moduleInfo = parts[1].text.split('-')
-
     moduleCode = moduleInfo[0].strip()
-    classInfo['module']['code'] = CheckModuleCode(moduleCode)
-    moduleInfo.pop(0)
 
-    classInfo['module']['name'] = moduleInfo[0].strip() if len(moduleInfo) == 1 else '-'.join(moduleInfo)
+    if len(moduleInfo) == 2:
+        classInfo['module']['code'] = CheckModuleCode(moduleCode)
+        classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo)
+    else:
+        classInfo['module']['code'] = None
+        classInfo['module']['name'] = moduleCode
 
         # Weeks
     weeksInfo = parts[6].text.split(',')
@@ -94,19 +95,25 @@ def GetTimetable():
 
         # Room Info
     if len(parts[7].text.strip()):
-        roomInfo = parts[7].text.strip()
-        roomCode = roomInfo[0:5]
-        classInfo['room']['code'] = CheckRoomCode(roomCode)
+        rooms = parts[7].text.split(';')
+        for room in rooms:
+            roomInfo = {}
 
-        seats = re.findall(r'\([0-9]*\)', roomInfo)
-        seats = seats[0].strip() if len(seats) == 1 else None
-        if (seats):
-            seats = seats.replace('(', '').replace(')', '')
+            room = room.strip()
+            roomCode = room[0:5]
+            roomInfo['code'] = CheckRoomCode(roomCode)
 
-        classInfo['room']['seats'] = CheckRoomSeats(seats)
+            seats = re.findall(r'\([0-9]*\)', room)
+            if seats:
+                seats = seats[0].strip() if len(seats) == 1 else None
+                if (seats):
+                    seats = seats.replace('(', '').replace(')', '')
 
-        roomType = re.split(r'\([0-9]*\)|[A-Z]\d{4} -', roomInfo)[1].strip()
-        classInfo['room']['type'] = roomType
+                roomInfo['seats'] = CheckRoomSeats(seats)
+
+            roomInfo['type'] = re.split(r'\([0-9]*\)|[A-Z]\d{4} ?-', room)[1].strip()
+
+            classInfo['rooms'].append(roomInfo)
 
     if len(parts[9].text.strip()):
         groups = parts[9].text.strip().split(';')
@@ -124,7 +131,7 @@ def GetTimetable():
 
 @app.route('/', methods=['POST'])
 def get_timetable():
-    return jsonify(GetTimetable())
+    return jsonify(GetTimetable(request.json['url']))
 
 if __name__ == '__main__':
     app.run(debug=True)
