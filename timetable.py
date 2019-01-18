@@ -1,11 +1,12 @@
-#!flask/bin/python
-from flask import Flask, jsonify, request, abort, make_response
-import urllib
+from urllib import request
 import datetime
 import re
 from bs4 import BeautifulSoup
+import json
 
-app = Flask(__name__)
+def lambda_handler(event, context):
+    response = GetTimetable("{{TIMETABLE_URL}}")
+    return response
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
@@ -32,11 +33,11 @@ def GetTimetable(url):
     startTime = datetime.datetime.strptime("09:00", "%H:%M")
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-    request = urllib.request.Request(url)
-    opener = urllib.request.build_opener()
-    response = opener.open(request)
+    req = request.Request(url)
+    opener = request.build_opener()
+    response = opener.open(req)
 
-    soup = BeautifulSoup(response, "lxml")
+    soup = BeautifulSoup(response, "html.parser")
     dayTables = soup.findAll('table', { 'width': None })
 
     daysClasses = []
@@ -135,16 +136,3 @@ def GetTimetable(url):
             classes.append(classInfo)
         daysClasses[i]['classes'] = classes
     return daysClasses
-
-@app.route('/', methods=['POST'])
-def get_timetable():
-    if 'url' not in request.json:
-        abort(404)
-    return jsonify(GetTimetable(request.json['url']))
-
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Missing Information'}), 404)
-
-if __name__ == '__main__':
-    app.run(debug=True)
