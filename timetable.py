@@ -5,8 +5,25 @@ from bs4 import BeautifulSoup
 import json
 
 def lambda_handler(event, context):
-    response = GetTimetable("{{TIMETABLE_URL}}")
-    return response
+    if 'info' in event and event['info'] == "classesCount":
+        return GetClassCount()
+    elif 'info' in event and event['info'] == "todaysClasses":
+        return GetTodaysClasses()
+    else:
+        return GetFullTimetable()
+
+def GetFullTimetable():
+    timetable = GetTimetable("{{TIMETABLE_URL}}")
+    return timetable
+
+def GetClassCount():
+    timetable = GetFullTimetable()
+    return { 'count': len(GetTodaysClasses()) }
+
+def GetTodaysClasses():
+    timetable = GetFullTimetable()
+    today = datetime.datetime.today().weekday()
+    return timetable[today]['classes']
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
