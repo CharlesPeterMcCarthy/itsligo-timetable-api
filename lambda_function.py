@@ -9,6 +9,8 @@ def lambda_handler(event, context):
         return GetClassCount()
     elif 'info' in event and event['info'] == "todaysClasses":
         return GetTodaysClasses()
+    elif 'info' in event and event['info'] == "tomorrowClasses":
+        return GetTomorrowClasses()
     else:
         return GetFullTimetable()
 
@@ -24,6 +26,11 @@ def GetTodaysClasses():
     timetable = GetFullTimetable()
     today = datetime.datetime.today().weekday()
     return timetable[today]['classes']
+
+def GetTomorrowClasses():
+    timetable = GetFullTimetable()
+    tomorrow = datetime.datetime.today().weekday() + 1
+    return timetable[tomorrow]['classes']
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
