@@ -15,7 +15,7 @@ def lambda_handler(event, context):
         return GetFullTimetable()
 
 def GetFullTimetable():
-    timetable = GetTimetable("{{TIMETABLE_URL}}")
+    timetable = GetTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
     return timetable
 
 def GetClassCount():
@@ -25,12 +25,14 @@ def GetClassCount():
 def GetTodaysClasses():
     timetable = GetFullTimetable()
     today = datetime.datetime.today().weekday()
-    return timetable[today]['classes']
+    classes = timetable[today]['classes']
+    return classes if classes else []
 
 def GetTomorrowClasses():
     timetable = GetFullTimetable()
     tomorrow = datetime.datetime.today().weekday() + 1
-    return timetable[tomorrow]['classes']
+    classes = timetable[tomorrow]['classes']
+    return classes if classes else []
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
