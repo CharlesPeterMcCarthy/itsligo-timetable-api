@@ -30,7 +30,8 @@ def GetTodaysClasses():
 
 def GetTomorrowClasses():
     timetable = GetFullTimetable()
-    tomorrow = datetime.datetime.today().weekday() + 1
+    tomorrowNum = datetime.datetime.today().weekday() + 1
+    tomorrow = tomorrowNum if tomorrowNum < 7 else 0
     classes = timetable[tomorrow]['classes']
     return classes if classes else []
 
