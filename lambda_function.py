@@ -1,5 +1,6 @@
 from urllib import request
 import datetime
+import time
 import re
 from bs4 import BeautifulSoup
 import json
@@ -11,6 +12,8 @@ def lambda_handler(event, context):
         return GetTodaysClasses()
     elif 'info' in event and event['info'] == "tomorrowClasses":
         return GetTomorrowClasses()
+    elif 'info' in event and event['info'] == "nextClass":
+        return GetNextClass()
     else:
         return GetFullTimetable()
 
@@ -34,6 +37,25 @@ def GetTomorrowClasses():
     tomorrow = tomorrowNum if tomorrowNum < 7 else 0
     classes = timetable[tomorrow]['classes']
     return classes if classes else []
+
+def GetNextClass():
+    timetable = GetFullTimetable()
+    today = datetime.datetime.today().weekday()
+    curTime = datetime.datetime.now().time()
+    i = today
+    while i < len(timetable):
+        nextClassDay = timetable[i]
+        if nextClassDay['classes'] and (curTime < datetime.datetime.time(datetime.datetime.strptime(nextClassDay['classes'][len(nextClassDay['classes']) - 1]['times']['start'], '%H:%M')) or i != today):
+            break
+        else:
+            i = i + 1 if i < 6 else 0
+
+    for cl in nextClassDay['classes']:
+        if curTime < datetime.datetime.time(datetime.datetime.strptime(cl['times']['start'], '%H:%M')) or i != today:
+            nextClass = cl
+            break
+
+    return cl
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
