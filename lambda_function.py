@@ -55,7 +55,8 @@ def GetNextClass():
             nextClass = cl
             break
 
-    return cl
+    nextClass = { 'class': cl, 'day': nextClassDay['day'], 'isToday': i == today }
+    return nextClass
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
