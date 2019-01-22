@@ -56,7 +56,20 @@ def GetNextClass():
             break
 
     nextClass = { 'class': cl, 'day': nextClassDay['day'], 'isToday': i == today }
+
+    if nextClass['isToday']:
+        nextClass['startsIn'] = GetTimeUntilClass(cl['times']['start'])
+
     return nextClass
+
+def GetTimeUntilClass(time):
+    curDatetime = datetime.datetime.now()
+    timeParts = time.split(':')
+    classDatetime = curDatetime.replace(hour = int(timeParts[0]), minute = int(timeParts[1]))
+    secondsDiff = (classDatetime - curDatetime).total_seconds()
+    hoursDiff = int(secondsDiff / (60 * 60))
+    minutesDiff = int((secondsDiff / 60) - (hoursDiff * 60))
+    return { 'hours': hoursDiff, 'minutes': minutesDiff }
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
