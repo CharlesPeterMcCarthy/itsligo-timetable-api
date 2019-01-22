@@ -130,9 +130,9 @@ def GetTimetable(url):
             moduleInfo = parts[1].text.split('-')
             moduleCode = moduleInfo[0].strip()
 
-            if len(moduleInfo) == 2:
+            if len(moduleInfo) >= 2:
                 classInfo['module']['code'] = CheckModuleCode(moduleCode)
-                classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo)
+                classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo[-2:])
             else:
                 classInfo['module']['code'] = None
                 classInfo['module']['name'] = moduleCode
