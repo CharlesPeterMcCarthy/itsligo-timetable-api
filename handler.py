@@ -7,17 +7,21 @@ import json
 
 def lambda_handler(event, context):
     if 'info' in event and event['info'] == "classesCount":
-        return GetClassCount()
+        body = GetClassCount()
     elif 'info' in event and event['info'] == "todaysClasses":
-        return GetTodaysClasses()
+        body = GetTodaysClasses()
     elif 'info' in event and event['info'] == "breaksToday":
-        return GetTodaysBreaks()
+        body = GetTodaysBreaks()
     elif 'info' in event and event['info'] == "tomorrowClasses":
-        return GetTomorrowClasses()
+        body = GetTomorrowClasses()
     elif 'info' in event and event['info'] == "nextClass":
-        return GetNextClass()
+        body = GetNextClass()
     else:
-        return GetFullTimetable()
+        body = GetFullTimetable()
+    return {
+        "statusCode": 200,
+        "body": json.dumps(body)
+    }
 
 def GetFullTimetable():
     timetable = GetTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
