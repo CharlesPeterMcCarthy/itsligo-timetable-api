@@ -1,91 +1,19 @@
-from urllib import request
 import datetime
 import time
 import re
-from bs4 import BeautifulSoup
 import json
+from urllib import request
+from bs4 import BeautifulSoup
 
-def lambda_handler(event, context):
-    if 'info' in event and event['info'] == "classesCount":
-        body = GetClassCount()
-    elif 'info' in event and event['info'] == "todaysClasses":
-        body = GetTodaysClasses()
-    elif 'info' in event and event['info'] == "breaksToday":
-        body = GetTodaysBreaks()
-    elif 'info' in event and event['info'] == "tomorrowClasses":
-        body = GetTomorrowClasses()
-    elif 'info' in event and event['info'] == "nextClass":
-        body = GetNextClass()
-    else:
-        body = GetFullTimetable()
+def Handler(event, context):
     return {
         "statusCode": 200,
-        "body": json.dumps(body)
+        "body": json.dumps(GetFullTimetable())
     }
 
 def GetFullTimetable():
     timetable = GetTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
     return timetable
-
-def GetClassCount():
-    timetable = GetFullTimetable()
-    return { 'count': len(GetTodaysClasses()) }
-
-def GetTodaysClasses():
-    timetable = GetFullTimetable()
-    today = datetime.datetime.today().weekday()
-    classes = timetable[today]['classes']
-    return classes if classes else []
-
-def GetTodaysBreaks():
-    classes = GetTodaysClasses()
-    breaks = []
-    for i in range(len(classes)):
-        curClass = classes[i]
-        nextClass = classes[i + 1] if i + 1 < len(classes) else None
-        if nextClass and curClass['times']['end'] != nextClass['times']['start']:
-            breaks.append({'times': {'start': curClass['times']['end'], 'end': nextClass['times']['start']}})
-    return breaks
-
-def GetTomorrowClasses():
-    timetable = GetFullTimetable()
-    tomorrowNum = datetime.datetime.today().weekday() + 1
-    tomorrow = tomorrowNum if tomorrowNum < 7 else 0
-    classes = timetable[tomorrow]['classes']
-    return classes if classes else []
-
-def GetNextClass():
-    timetable = GetFullTimetable()
-    today = datetime.datetime.today().weekday()
-    curTime = datetime.datetime.now().time()
-    i = today
-    while i < len(timetable):
-        nextClassDay = timetable[i]
-        if nextClassDay['classes'] and (curTime < datetime.datetime.time(datetime.datetime.strptime(nextClassDay['classes'][len(nextClassDay['classes']) - 1]['times']['start'], '%H:%M')) or i != today):
-            break
-        else:
-            i = i + 1 if i < 6 else 0
-
-    for cl in nextClassDay['classes']:
-        if curTime < datetime.datetime.time(datetime.datetime.strptime(cl['times']['start'], '%H:%M')) or i != today:
-            nextClass = cl
-            break
-
-    nextClass = { 'class': cl, 'day': nextClassDay['day'], 'isToday': i == today }
-
-    if nextClass['isToday']:
-        nextClass['startsIn'] = GetTimeUntilClass(cl['times']['start'])
-
-    return nextClass
-
-def GetTimeUntilClass(time):
-    curDatetime = datetime.datetime.now()
-    timeParts = time.split(':')
-    classDatetime = curDatetime.replace(hour = int(timeParts[0]), minute = int(timeParts[1]))
-    secondsDiff = (classDatetime - curDatetime).total_seconds()
-    hoursDiff = int(secondsDiff / (60 * 60))
-    minutesDiff = int((secondsDiff / 60) - (hoursDiff * 60))
-    return { 'hours': hoursDiff, 'minutes': minutesDiff }
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
