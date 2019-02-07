@@ -5,14 +5,12 @@ from functions.timetable.timetable import GetFullTimetable
 def Handler(event, context):
     return {
         "statusCode": 200,
-        "body": json.dumps(GetClassCount())
+        "body": json.dumps(GetClassesTomorrow())
     }
 
-def GetClassCount():
-    return { 'count': len(GetTodaysClasses()) }
-
-def GetTodaysClasses():
+def GetClassesTomorrow():
     timetable = GetFullTimetable()
-    today = datetime.datetime.today().weekday()
-    classes = timetable[today]['classes']
+    tomorrowNum = datetime.datetime.today().weekday() + 1
+    tomorrow = tomorrowNum if tomorrowNum < 7 else 0
+    classes = timetable[tomorrow]['classes']
     return classes if classes else []

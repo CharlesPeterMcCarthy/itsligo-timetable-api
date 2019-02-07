@@ -20,31 +20,31 @@ functions:
          path: /timetable
          method: get
   class-count-today:
-    handler: functions/counts/class-count-today.Handler
+    handler: functions/counts/class_count_today.Handler
     events:
      - http:
          path: /class-count/today
          method: get
   classes-today:
-    handler: functions/classes/classes-today.Handler
+    handler: functions/classes/classes_today.Handler
     events:
      - http:
          path: /classes/today
          method: get
   classes-tomorrow:
-    handler: functions/classes/classes-tomorrow.Handler
+    handler: functions/classes/classes_tomorrow.Handler
     events:
      - http:
          path: /classes/tomorrow
          method: get
   next-class:
-    handler: functions/classes/next-class.Handler
+    handler: functions/classes/next_class.Handler
     events:
      - http:
          path: /classes/next
          method: get
   breaks-today:
-    handler: functions/breaks/breaks-today.Handler
+    handler: functions/breaks/breaks_today.Handler
     events:
      - http:
          path: /breaks/today

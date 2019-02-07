@@ -12,7 +12,7 @@ def Handler(event, context):
     }
 
 def GetFullTimetable():
-    timetable = GetTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
+    timetable = ParseTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
     return timetable
 
 def CheckModuleCode(moduleCode):
@@ -36,7 +36,7 @@ def CheckCourseCode(courseCode):
 def CheckCourseYear(courseYear):
     return courseYear[1] if re.match(r'Y\d', courseYear) else None
 
-def GetTimetable(url):
+def ParseTimetable(url):
     startTime = datetime.datetime.strptime("09:00", "%H:%M")
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
