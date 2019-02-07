@@ -18,3 +18,9 @@ var/
 
 # Serverless directories
 .serverless
+
+# Extra packages
+bs4/
+lxml
+urllib
+urllib3
