@@ -19,33 +19,46 @@ functions:
      - http:
          path: /timetable
          method: get
+         cors: true
   class-count-today:
     handler: functions/counts/class_count_today.Handler
     events:
      - http:
          path: /class-count/today
          method: get
+         cors: true
   classes-today:
     handler: functions/classes/classes_today.Handler
     events:
      - http:
          path: /classes/today
          method: get
+         cors: true
   classes-tomorrow:
     handler: functions/classes/classes_tomorrow.Handler
     events:
      - http:
          path: /classes/tomorrow
          method: get
+         cors: true
   next-class:
     handler: functions/classes/next_class.Handler
     events:
      - http:
          path: /classes/next
          method: get
+         cors: true
   breaks-today:
     handler: functions/breaks/breaks_today.Handler
     events:
      - http:
          path: /breaks/today
          method: get
+         cors: true
+  login:
+    handler: functions/users/login.Handler
+    events:
+     - http:
+         path: /login
+         method: post
+         cors: true
