@@ -1,7 +1,7 @@
 import json
-import boto3
 import random
-from helpers import DecimalDefault
+import helpers.functions as fnc
+import helpers.tables as tbl
 
 def Handler(event, context):
     data = json.loads(event['body'])
@@ -9,9 +9,10 @@ def Handler(event, context):
 
 def CheckLoginDetails(data):
     try:
-        userTable = GetUserTable()
+        userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.get_item(Key={'StudentID': data['studentID']})
         res = res['Item'] if 'Item' in res else { 'error': 'No user matches that Student ID' }
+
         if 'Password' in res:
             if data['password'] != res['Password']:
                 res = { 'error': 'Password is incorrect'}
@@ -20,7 +21,7 @@ def CheckLoginDetails(data):
         if 'error' not in res:
             res = { 'user': res, 'access-token': GenerateAccessToken() }
     except:
-        res = { 'error': 'unknown error' }
+        res = { 'error': 'Unknown error' }
 
     return {
         'statusCode': 200,
@@ -28,16 +29,8 @@ def CheckLoginDetails(data):
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps(res, default=DecimalDefault)
+        'body': json.dumps(res)
     }
-
-def GetUserTable():
-    try:
-        dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table("Users2")
-    except:
-        return { 'error': 'Unable to connect to database' }
-    return table
 
 def GenerateAccessToken():
     return str("%032x" % random.getrandbits(128))
