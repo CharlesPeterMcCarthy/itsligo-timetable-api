@@ -62,3 +62,10 @@ functions:
          path: /login
          method: post
          cors: true
+  register:
+    handler: functions/users/register.Handler
+    events:
+     - http:
+         path: /register
+         method: post
+         cors: true
