@@ -13,8 +13,9 @@ package:
     - functions/timetable/**
 
 functions:
+  # Public API
   all:
-    handler: functions/timetable/timetable.Handler
+    handler: public_api/timetable/timetable.Handler
     events:
      - http:
          path: /timetable
@@ -24,50 +25,52 @@ functions:
          path: /timetable
          method: post
          cors: true
+  # Alexa API
   class-count-today:
-    handler: functions/counts/class_count_today.Handler
+    handler: alexa/counts/class_count_today.Handler
     events:
      - http:
          path: /class-count/today
          method: get
          cors: true
   classes-today:
-    handler: functions/classes/classes_today.Handler
+    handler: alexa/classes/classes_today.Handler
     events:
      - http:
          path: /classes/today
          method: get
          cors: true
   classes-tomorrow:
-    handler: functions/classes/classes_tomorrow.Handler
+    handler: alexa/classes/classes_tomorrow.Handler
     events:
      - http:
          path: /classes/tomorrow
          method: get
          cors: true
   next-class:
-    handler: functions/classes/next_class.Handler
+    handler: alexa/classes/next_class.Handler
     events:
      - http:
          path: /classes/next
          method: get
          cors: true
   breaks-today:
-    handler: functions/breaks/breaks_today.Handler
+    handler: alexa/breaks/breaks_today.Handler
     events:
      - http:
          path: /breaks/today
          method: get
          cors: true
+  # Private API
   login:
-    handler: functions/users/login.Handler
+    handler: private_api/users/login.Handler
     events:
      - http:
          path: /login
          method: post
          cors: true
   register:
-    handler: functions/users/register.Handler
+    handler: private_api/users/register.Handler
     events:
      - http:
          path: /register

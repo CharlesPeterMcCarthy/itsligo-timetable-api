@@ -15,9 +15,9 @@ def CheckLoginDetails(data):
 
         if 'Password' in res:
             if fnc.VerifyPassword(fnc.EncryptPassword(data['password']), res['Password']):
-                res = { 'error': 'Password is incorrect'}
-            else:
                 del res['Password']
+            else:
+                res = { 'error': 'Password is incorrect'}
         if 'error' not in res:
             res = { 'user': res, 'access-token': GenerateAccessToken() }
     except:

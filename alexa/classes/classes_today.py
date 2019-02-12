@@ -1,6 +1,6 @@
 import datetime
 import json
-from functions.timetable.timetable import GetFullTimetable
+from public_api.timetable.timetable import GetFullTimetable
 
 def Handler(event, context):
     return {

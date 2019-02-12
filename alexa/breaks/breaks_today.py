@@ -1,7 +1,7 @@
 import datetime
 import json
-from functions.timetable.timetable import GetFullTimetable
-from functions.classes.classes_today import GetClassesToday
+from public_api.timetable.timetable import GetFullTimetable
+from alexa.classes.classes_today import GetClassesToday
 
 def Handler(event, context):
     return {
