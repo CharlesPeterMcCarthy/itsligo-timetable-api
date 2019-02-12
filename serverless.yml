@@ -20,6 +20,10 @@ functions:
          path: /timetable
          method: get
          cors: true
+     - http:
+         path: /timetable
+         method: post
+         cors: true
   class-count-today:
     handler: functions/counts/class_count_today.Handler
     events:

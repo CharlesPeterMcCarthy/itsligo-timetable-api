@@ -4,15 +4,14 @@ import re
 import json
 from urllib import request
 from bs4 import BeautifulSoup
+import helpers.functions as fnc
 
 def Handler(event, context):
-    return {
-        "statusCode": 200,
-        "body": json.dumps(GetFullTimetable())
-    }
+    data = json.loads(event['body'])
+    return fnc.FormResponse(GetFullTimetable(data['TimetableURL'])) if 'TimetableURL' in data else { 'error': 'Missing URL' }
 
-def GetFullTimetable():
-    timetable = ParseTimetable("http://timetables.itsligo.ie:81/reporting/textspreadsheet;student+set;id;SG_KCOMP_H08%2FF%2FY2%2F1%2F%28A%29%0D%0A?t=student+set+textspreadsheet&days=1-7&weeks=22-33;36&periods=1-28&template=student+set+textspreadsheet")
+def GetFullTimetable(timetableURL):
+    timetable = ParseTimetable(timetableURL)
     return timetable
 
 def CheckModuleCode(moduleCode):

@@ -1,5 +1,6 @@
 import decimal
 import boto3
+import json
 from passlib.context import CryptContext
 
 def DecimalDefault(obj):
@@ -26,3 +27,13 @@ def EncryptPassword(password):
 
 def VerifyPassword(password, hashedPass):
     return pwd_context.verify(password, hashedPass)
+
+def FormResponse(body):
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
+        'body': json.dumps(body, default=DecimalDefault)
+    }
