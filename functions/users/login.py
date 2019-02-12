@@ -14,7 +14,7 @@ def CheckLoginDetails(data):
         res = res['Item'] if 'Item' in res else { 'error': 'No user matches that Student ID' }
 
         if 'Password' in res:
-            if data['password'] != res['Password']:
+            if fnc.VerifyPassword(fnc.EncryptPassword(data['password']), res['Password']):
                 res = { 'error': 'Password is incorrect'}
             else:
                 del res['Password']
