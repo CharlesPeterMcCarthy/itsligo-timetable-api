@@ -83,3 +83,10 @@ functions:
          path: /register
          method: post
          cors: true
+  change_timetable:
+    handler: private_api/users/change_timetable.Handler
+    events:
+     - http:
+         path: /change-timetable
+         method: post
+         cors: true

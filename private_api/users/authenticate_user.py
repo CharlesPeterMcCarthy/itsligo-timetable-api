@@ -4,7 +4,7 @@ import helpers.tables as tbl
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return AuthUser(data) if 'StudentID' in data and 'AuthToken' in data else fnc.FormResponse({ 'error': 'Missing Details' })
+    return AuthUser(data) if all(d in data for d in ("StudentID", "AuthToken")) else fnc.FormResponse({ 'error': 'Missing Details' })
 
 def AuthUser(data):
     try:
