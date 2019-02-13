@@ -1,6 +1,7 @@
 import decimal
 import boto3
 import json
+import random
 from passlib.context import CryptContext
 
 def DecimalDefault(obj):
@@ -37,3 +38,6 @@ def FormResponse(body):
         },
         'body': json.dumps(body, default=DecimalDefault)
     }
+
+def GenerateAccessToken():
+    return str("%032x" % random.getrandbits(128))

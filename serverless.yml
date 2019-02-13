@@ -62,6 +62,13 @@ functions:
          method: get
          cors: true
   # Private API
+  auth:
+    handler: private_api/users/authenticate_user.Handler
+    events:
+     - http:
+         path: /auth
+         method: post
+         cors: true
   login:
     handler: private_api/users/login.Handler
     events:

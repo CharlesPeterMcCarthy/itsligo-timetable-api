@@ -1,5 +1,4 @@
 import json
-import random
 import helpers.functions as fnc
 import helpers.tables as tbl
 
@@ -12,7 +11,7 @@ def RegisterUser(data):
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
-        res = userTable.put_item(Item={'StudentID': data['studentID'], 'Name': data['name'], 'Password': hashedPass})
+        res = userTable.put_item(Item={ 'StudentID': data['studentID'], 'Name': data['name'], 'Password': hashedPass })
     except:
         res = { 'error': 'Unknown error' }
 
