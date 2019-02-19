@@ -30,6 +30,12 @@ def EncryptPassword(password):
 def VerifyPassword(password, hashedPass):
     return pwd_context.verify(password, hashedPass)
 
+def SuccessResponse(body):
+    return FormResponse(200, body)
+
+def ErrorResponse(error):
+    return FormResponse(error['code'], { 'errorText': error['errorText'] })
+
 def FormResponse(code, body):
     return {
         'statusCode': code,
