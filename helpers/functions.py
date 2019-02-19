@@ -30,9 +30,9 @@ def EncryptPassword(password):
 def VerifyPassword(password, hashedPass):
     return pwd_context.verify(password, hashedPass)
 
-def FormResponse(body):
+def FormResponse(code, body):
     return {
-        'statusCode': 200,
+        'statusCode': code,
         'headers': {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
