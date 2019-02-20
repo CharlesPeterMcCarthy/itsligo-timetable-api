@@ -5,7 +5,7 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return CheckLoginDetails(data) if 'studentID' in data and 'password' in data else fnc.ErrorResponse(err.MISSING_DETAILS)
+    return CheckLoginDetails(data) if all(d in data for d in ('studentID', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def CheckLoginDetails(data):
     try:

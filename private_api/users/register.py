@@ -1,10 +1,11 @@
 import json
 import helpers.functions as fnc
 import helpers.tables as tbl
+import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return RegisterUser(data) if 'studentID' in data and 'name' in data and 'password' in data else fnc.FormResponse({ 'error': 'Missing Details' })
+    return RegisterUser(data) if all(d in data for d in ('studentID', 'name', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def RegisterUser(data):
     hashedPass = fnc.EncryptPassword(data['password'])
@@ -13,6 +14,6 @@ def RegisterUser(data):
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={ 'StudentID': data['studentID'], 'Name': data['name'], 'Password': hashedPass })
     except:
-        res = { 'error': 'Unknown error' }
+        return fnc.ErrorResponse(err.UNKNOWN)
 
-    return fnc.FormResponse(res)
+    return fnc.SuccessResponse(res)
