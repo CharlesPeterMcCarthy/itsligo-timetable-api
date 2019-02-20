@@ -5,7 +5,7 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return ChangeTimetable(data) if all(d in data for d in ('StudentID', 'TimetableURL')) else fnc.ErrorResponse(err.MISSING_DETAILS)
+    return ChangeTimetable(data) fnc.ContainsAllData(data, ('StudentID', 'TimetableURL')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def ChangeTimetable(data):
     try:

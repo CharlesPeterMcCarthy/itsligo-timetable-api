@@ -3,6 +3,7 @@ import boto3
 import json
 import random
 import helpers.tables as tbl
+import helpers.errors as err
 from passlib.context import CryptContext
 
 def DecimalDefault(obj):
@@ -54,14 +55,18 @@ def AuthUser(data):
         userTable = GetDataTable(tbl.AUTH)
         res = userTable.get_item(Key={ 'StudentID': data['StudentID'] })
     except:
-        res = { 'error': 'Database error' }
+        return ErrorResponse(err.UNKNOWN)
 
-    res = res['Item'] if 'Item' in res else { 'error': 'No user matches that Student ID - Force Logout' }   # Error codes to be setup
+    if 'Item' in res:
+        res = res['Item']
+    else:
+        return ErrorResponse(err.INVALID_STUDENTID)
 
     if 'AuthToken' in res:
         if res['AuthToken'] != data['AuthToken']:
-            res = { 'error': 'Auth Token is invalid - Force Logout' }    # Error codes to be setup
-    if 'error' not in res:
-        res = { 'AuthOk': True }
+            return ErrorResponse(err.INVALID_AUTH_TOKEN)
 
-    return FormResponse(res)
+    return SuccessResponse({ 'AuthOk': True })
+
+def ContainsAllData(data, fields):
+    return all(d in data for d in fields)

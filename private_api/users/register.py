@@ -5,7 +5,7 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return RegisterUser(data) if all(d in data for d in ('studentID', 'name', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
+    return RegisterUser(data) if fnc.ContainsAllData(data, ('studentID', 'name', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def RegisterUser(data):
     hashedPass = fnc.EncryptPassword(data['password'])
