@@ -8,11 +8,7 @@ import helpers.functions as fnc
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return fnc.FormResponse(GetFullTimetable(data['TimetableURL'])) if 'TimetableURL' in data else { 'error': 'Missing URL' }
-
-def GetFullTimetable(timetableURL):
-    timetable = ParseTimetable(timetableURL)
-    return timetable
+    return ParseTimetable(data['TimetableURL']) if 'TimetableURL' in data else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def CheckModuleCode(moduleCode):
     return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
@@ -39,9 +35,12 @@ def ParseTimetable(url):
     startTime = datetime.datetime.strptime("09:00", "%H:%M")
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
-    req = request.Request(url)
-    opener = request.build_opener()
-    response = opener.open(req)
+    try:
+        req = request.Request(url)
+        opener = request.build_opener()
+        response = opener.open(req)
+    except:
+        return fnc.ErrorResponse(err.TIMETABLE_ACCESS)
 
     soup = BeautifulSoup(response, "html.parser")
     dayTables = soup.findAll('table', { 'width': None })
@@ -141,4 +140,4 @@ def ParseTimetable(url):
 
             classes.append(classInfo)
         daysClasses[i]['classes'] = classes
-    return daysClasses
+    return fnc.SuccessResponse(daysClasses)
