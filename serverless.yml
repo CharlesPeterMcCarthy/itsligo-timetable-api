@@ -32,6 +32,13 @@ functions:
          path: /departments
          method: get
          cors: true
+  courses:
+    handler: public_api/departments/courses.Handler
+    events:
+     - http:
+         path: /courses
+         method: get
+         cors: true
   # Alexa API
   class-count-today:
     handler: alexa/counts/class_count_today.Handler

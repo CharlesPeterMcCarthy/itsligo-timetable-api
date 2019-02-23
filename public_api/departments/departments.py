@@ -8,8 +8,8 @@ def Handler(event, context):
 
 def GetAllDepartments():
     try:
-        courseTable = fnc.GetDataTable(tbl.DEPTS)
-        res = courseTable.scan(
+        deptTable = fnc.GetDataTable(tbl.DEPTS)
+        res = deptTable.scan(
             ProjectionExpression="DepartmentName"
         )
     except:
