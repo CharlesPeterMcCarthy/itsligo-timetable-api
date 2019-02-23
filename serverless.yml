@@ -25,6 +25,13 @@ functions:
          path: /timetable
          method: post
          cors: true
+  departments:
+    handler: public_api/departments/departments.Handler
+    events:
+     - http:
+         path: /departments
+         method: get
+         cors: true
   # Alexa API
   class-count-today:
     handler: alexa/counts/class_count_today.Handler
