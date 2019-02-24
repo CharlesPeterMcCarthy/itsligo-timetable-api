@@ -5,6 +5,7 @@ INVALID_AUTH_TOKEN = { 'code': 403, 'errorText': 'Invalid Auth Token' }
 
 INVALID_STUDENTID = { 'code': 401, 'errorText': 'No user matches that Student ID' }
 WRONG_PASSWORD = { 'code': 401, 'errorText': 'Password is Incorrect' }
+UNVERIFIED_USER = { 'code': 401, 'errorText': 'Your email has not been verified yet' }
 
 TIMETABLE_UPDATE = { 'code': 304, 'errorText': 'Your timetable could not be updated' }
 TIMETABLE_ACCESS = { 'code': 404, 'errorText': 'Unable to access ITSligo Timetable' }

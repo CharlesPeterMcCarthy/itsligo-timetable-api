@@ -19,6 +19,9 @@ def CheckLoginDetails(data):
     else:
         return fnc.ErrorResponse(err.INVALID_STUDENTID)
 
+    if not res['Verified']:
+        return fnc.ErrorResponse(err.UNVERIFIED_USER)
+
     if 'Password' in res:
         if fnc.VerifyPassword(data['password'], res['Password']):
             del res['Password']
