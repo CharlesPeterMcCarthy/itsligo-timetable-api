@@ -140,4 +140,4 @@ def ParseTimetable(url):
 
             classes.append(classInfo)
         daysClasses[i]['classes'] = classes
-    return fnc.SuccessResponse(daysClasses)
+    return fnc.SuccessResponse({ 'timetable': { 'days': daysClasses } })

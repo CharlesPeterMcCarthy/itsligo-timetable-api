@@ -7,6 +7,12 @@ provider:
   stage: dev
   tags:
     project: timetable
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+        - ses:SendRawEmail
+      Resource: "*"
 
 package:
   include:

@@ -2,6 +2,7 @@ import json
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
+import emails.confirm_email as email
 
 def Handler(event, context):
     data = json.loads(event['body'])
@@ -14,6 +15,12 @@ def RegisterUser(data):
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={ 'StudentID': data['studentID'], 'Name': data['name'], 'Password': hashedPass })
     except:
-        return fnc.ErrorResponse(err.UNKNOWN)
+        return fnc.ErrorResponse(err.DB_IN)
 
-    return fnc.SuccessResponse(res)
+    if res['ResponseMetadata']['HTTPStatusCode'] == 200:
+        emailRes = email.SendConfirmEmail()
+
+        if emailRes['statusCode'] == 200:
+            return fnc.SuccessResponse(res)
+        else:
+            return emailRes
