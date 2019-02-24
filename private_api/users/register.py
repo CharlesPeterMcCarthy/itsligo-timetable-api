@@ -26,7 +26,8 @@ def RegisterUser(data):
             'StudentID': studentID,
             'Email': email,
             'Name': name,
-            'Password': hashedPass
+            'Password': hashedPass,
+            'Verified': False
         })
     except:
         return fnc.ErrorResponse(err.DB_IN)

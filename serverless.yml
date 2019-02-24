@@ -103,6 +103,13 @@ functions:
          path: /register
          method: post
          cors: true
+  confirm:
+    handler: private_api/users/confirm_email.Handler
+    events:
+     - http:
+         path: /confirm
+         method: post
+         cors: true
   change_timetable:
     handler: private_api/users/change_timetable.Handler
     events:

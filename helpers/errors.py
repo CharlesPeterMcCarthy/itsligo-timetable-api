@@ -12,6 +12,8 @@ TIMETABLE_ACCESS = { 'code': 404, 'errorText': 'Unable to access ITSligo Timetab
 EMAIL_CON = { 'code': 400, 'errorText': 'Failed to send confirmation email' }
 INVALID_EMAIL = { 'code': 400, 'errorText': 'Email is invalid - Must be an ITSligo student email address' }
 
+INVALID_CONFIRM_CODE = { 'code': 400, 'errorText': 'Confirmation code is invalid' }
+
 DB_QU = { 'code': 400, 'errorText': 'An error occurred while querying the database' }
 DB_IN = { 'code': 400, 'errorText': 'An error occurred while inserting data into the database' }
 DB_UP = { 'code': 400, 'errorText': 'An error occurred while updating data in the database' }
