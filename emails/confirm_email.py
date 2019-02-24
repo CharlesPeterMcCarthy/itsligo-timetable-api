@@ -1,19 +1,20 @@
 import boto3
 import helpers.functions as fnc
 import helpers.errors as err
-import emails.email_info as email
+import emails.email_info as info
 from botocore.exceptions import ClientError
 
-def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL):
-    SENDER = FormSenderDetails(email.SENDER_NAME, email.SENDER_EMAIL)
+def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL, CONFIRM_CODE):
+    SENDER = FormSenderDetails(info.SENDER_NAME, info.SENDER_EMAIL)
+    CONFIRM_URL = ConfigureConfirmationURL(CONFIRM_CODE)
     SUBJECT = "ITSligo Timetable"
     CHARSET = "UTF-8"
 
     BODY_TEXT = (
-                    "Welcome" + RECIPIENT_NAME + "\r\n"
-                    "Please confirm your email by copying and pasting the "
-                    "following URL into your browser: \r\n" + email.SITE_URL
-                )
+        "Welcome" + RECIPIENT_NAME + "\r\n"
+        "Please confirm your email by copying and pasting the "
+        "following URL into your browser: \r\n" + CONFIRM_URL
+    )
 
     BODY_HTML = "<html>\
         <head></head>\
@@ -21,7 +22,7 @@ def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL):
             <h2>ITSligo Timetable</h2>\
             <p>Welcome " + RECIPIENT_NAME + "!\
             <p>Please confirm your email by clicking on the following URL: </p>\
-            <a href='" + email.SITE_URL + "'>Link to localhost</a>\
+            <a href='" + CONFIRM_URL + "'>Confirm Email</a>\
         </body>\
     </html>"
 
@@ -56,4 +57,7 @@ def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL):
         return fnc.SuccessResponse(res)
 
 def FormSenderDetails(name, email):
-    return name + " <" + email + ">"
+    return f'{name} <{email}>'
+
+def ConfigureConfirmationURL(confirmationCode):
+    return f'{info.SITE_URL}/confirm/{confirmationCode}'
