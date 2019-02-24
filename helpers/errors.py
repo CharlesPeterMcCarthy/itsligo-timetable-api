@@ -8,3 +8,9 @@ WRONG_PASSWORD = { 'code': 401, 'errorText': 'Password is Incorrect' }
 
 TIMETABLE_UPDATE = { 'code': 304, 'errorText': 'Your timetable could not be updated' }
 TIMETABLE_ACCESS = { 'code': 404, 'errorText': 'Unable to access ITSligo Timetable' }
+
+EMAIL_CON = { 'code': 400, 'errorText': 'Failed to send confirmation email' }
+
+DB_QU = { 'code': 400, 'errorText': 'An error occurred while querying the database' }
+DB_IN = { 'code': 400, 'errorText': 'An error occurred while inserting data into the database' }
+DB_UP = { 'code': 400, 'errorText': 'An error occurred while updating data in the database' }
