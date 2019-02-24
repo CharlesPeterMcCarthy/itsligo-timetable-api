@@ -1,5 +1,6 @@
 import json
 import re
+import random
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
@@ -14,23 +15,46 @@ def RegisterUser(data):
     studentID = GetStudentID(email)
     name = data['name']
     hashedPass = fnc.EncryptPassword(data['password'])
+    confirmationCode = GenerateConfirmationCode()
 
     if not studentID:
         return fnc.ErrorResponse(err.INVALID_EMAIL)
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
-        res = userTable.put_item(Item={ 'StudentID': studentID, 'Email': email, 'Name': name, 'Password': hashedPass })
+        res = userTable.put_item(Item={
+            'StudentID': studentID,
+            'Email': email,
+            'Name': name,
+            'Password': hashedPass
+        })
     except:
         return fnc.ErrorResponse(err.DB_IN)
 
-    if res['ResponseMetadata']['HTTPStatusCode'] == 200:
-        emailRes = mail.SendConfirmEmail(name, email)
+    confirmRes = SaveConfirmationInfo(confirmationCode, studentID)
 
-        if emailRes['statusCode'] == 200:
-            return fnc.SuccessResponse(res)
-        else:
-            return emailRes
+    if confirmRes['statusCode'] != 200:
+        return confirmRes
+
+    emailRes = mail.SendConfirmEmail(name, email, confirmationCode)
+
+    return fnc.SuccessResponse(res) if emailRes['statusCode'] == 200 else emailRes
+
+def SaveConfirmationInfo(confirmationCode, studentID):
+    try:
+        confirmTable = fnc.GetDataTable(tbl.CONFIRM)
+        res = confirmTable.put_item(Item={
+            'Code': confirmationCode,
+            'StudentID': studentID,
+            'Confirmed': False
+        })
+
+        return fnc.SuccessResponse(res)
+    except:
+        return fnc.ErrorResponse(err.DB_IN)
 
 def GetStudentID(email):
     return email[:9].upper() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None
+
+def GenerateConfirmationCode():
+    return str("%032x" % random.getrandbits(128))
