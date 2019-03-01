@@ -5,7 +5,10 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return ChangeTimetable(data) if fnc.ContainsAllData(data, ('StudentID', 'TimetableURL')) else fnc.ErrorResponse(err.MISSING_DETAILS)
+    if not fnc.ContainsAllData(data, ('AuthToken', 'StudentID', 'TimetableURL')): return fnc.ErrorResponse(err.MISSING_DETAILS)
+    auth = fnc.AuthUser(data)
+    if 'AuthOk' not in auth or not auth['AuthOk']: return auth
+    return ChangeTimetable(data)
 
 def ChangeTimetable(data):
     try:
