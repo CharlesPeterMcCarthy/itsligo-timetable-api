@@ -47,26 +47,32 @@ def FormResponse(code, body):
         'body': json.dumps(body, default=DecimalDefault)
     }
 
-def GenerateAccessToken():
+def GenerateAuthToken():
     return str("%032x" % random.getrandbits(128))
 
 def AuthUser(data):
     try:
         userTable = GetDataTable(tbl.AUTH)
         res = userTable.get_item(Key={ 'StudentID': data['StudentID'] })
-    except:
-        return ErrorResponse(err.UNKNOWN)
+    except: return err.DB_QU
 
-    if 'Item' in res:
-        res = res['Item']
-    else:
-        return ErrorResponse(err.INVALID_STUDENTID)
+    if 'Item' in res: res = res['Item']
+    else: return err.INVALID_STUDENTID
 
-    if 'AuthToken' in res:
-        if res['AuthToken'] != data['AuthToken']:
-            return ErrorResponse(err.INVALID_AUTH_TOKEN)
+    if 'AuthToken' in res and res['AuthToken'] == data['AuthToken']: return { 'AuthOk': True }
+    return err.INVALID_AUTH_TOKEN
 
-    return SuccessResponse({ 'AuthOk': True })
+def UpdateAuthToken(studentID, authToken):
+    try:
+        authTable = GetDataTable(tbl.AUTH)
+        res = authTable.update_item(
+            Key={ 'StudentID': studentID },
+            UpdateExpression="set AuthToken = :a",
+            ExpressionAttributeValues={ ':a': authToken },
+            ReturnValues="UPDATED_NEW"
+        )
+    except: return err.DB_UP
+    return { 'Updated': True }
 
 def ContainsAllData(data, fields):
     return all(d in data for d in fields)

@@ -7,7 +7,7 @@ def Handler(event, context):
     data = json.loads(event['body'])
     if not fnc.ContainsAllData(data, ('AuthToken', 'StudentID', 'TimetableURL')): return fnc.ErrorResponse(err.MISSING_DETAILS)
     auth = fnc.AuthUser(data)
-    if 'AuthOk' not in auth or not auth['AuthOk']: return auth
+    if 'AuthOk' not in auth or not auth['AuthOk']: return fnc.ErrorResponse(auth)
     return ChangeTimetable(data)
 
 def ChangeTimetable(data):

@@ -11,21 +11,17 @@ def CheckLoginDetails(data):
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.get_item(Key={ 'StudentID': data['studentID'] })
-    except:
-        return fnc.ErrorResponse(err.UNKNOWN)
+    except: return fnc.ErrorResponse(err.DB_QU)
 
-    if 'Item' in res:
-        res = res['Item']
-    else:
-        return fnc.ErrorResponse(err.INVALID_STUDENTID)
+    if 'Item' in res: res = res['Item']
+    else: return fnc.ErrorResponse(err.INVALID_STUDENTID)
 
-    if not res['Verified']:
-        return fnc.ErrorResponse(err.UNVERIFIED_USER)
+    if not res['Verified']: return fnc.ErrorResponse(err.UNVERIFIED_USER)
 
-    if 'Password' in res:
-        if fnc.VerifyPassword(data['password'], res['Password']):
-            del res['Password']
-        else:
-            return fnc.ErrorResponse(err.WRONG_PASSWORD)
+    if 'Password' in res and fnc.VerifyPassword(data['password'], res['Password']): del res['Password']
+    else: return fnc.ErrorResponse(err.WRONG_PASSWORD)
 
-    return fnc.SuccessResponse({ 'user': res, 'Access-Token': fnc.GenerateAccessToken() })
+    authToken = fnc.GenerateAuthToken()
+    authRes = fnc.UpdateAuthToken(data['studentID'], authToken)
+
+    return fnc.SuccessResponse({ 'user': res, 'Access-Token': authToken }) if 'Updated' in authRes and authRes['Updated'] else fnc.ErrorResponse(authRes)
