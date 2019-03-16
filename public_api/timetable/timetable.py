@@ -5,6 +5,7 @@ import json
 from urllib import request
 from bs4 import BeautifulSoup
 import helpers.functions as fnc
+import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
@@ -30,6 +31,23 @@ def CheckCourseCode(courseCode):
 
 def CheckCourseYear(courseYear):
     return courseYear[1] if re.match(r'Y\d', courseYear) else None
+
+def AddBreaks(days):
+    for day in days:
+        print(day['day'])
+        classes = day['classes']
+        if classes is None:
+            day['breaks'] = None
+            continue
+
+        breaks = []
+        for i in range(len(classes)):
+            curClass = classes[i]
+            nextClass = classes[i + 1] if i + 1 < len(classes) else None
+            if nextClass and curClass['times']['end'] != nextClass['times']['start'] and curClass['times']['end'] < nextClass['times']['start']:
+                breaks.append({'times': {'start': curClass['times']['end'], 'end': nextClass['times']['start']}})
+        day['breaks'] = breaks
+    return days
 
 def ParseTimetable(url):
     startTime = datetime.datetime.strptime("09:00", "%H:%M")
@@ -140,4 +158,6 @@ def ParseTimetable(url):
 
             classes.append(classInfo)
         daysClasses[i]['classes'] = classes
+
+    daysClasses = AddBreaks(daysClasses)
     return fnc.SuccessResponse({ 'timetable': { 'days': daysClasses } })
