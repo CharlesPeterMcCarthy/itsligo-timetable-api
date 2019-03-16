@@ -25,3 +25,5 @@ lxml
 urllib
 urllib3
 passlib
+
+*__pycache__

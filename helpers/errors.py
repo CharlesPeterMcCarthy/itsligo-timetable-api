@@ -4,6 +4,8 @@ MISSING_DETAILS = { 'code': 401, 'errorText': 'Details are missing from the requ
 INVALID_AUTH_TOKEN = { 'code': 403, 'errorText': 'Invalid Auth Token' }
 NO_AUTH_TOKEN = { 'code': 403, 'errorText': 'No Auth Token associated with your account' }
 
+NO_TIMETABLE_RETURN_DATA = { 'code': 401, 'errorText': 'Classes, breaks or both must be included' }
+
 INVALID_STUDENTID = { 'code': 401, 'errorText': 'No user matches that Student ID' }
 WRONG_PASSWORD = { 'code': 401, 'errorText': 'Password is Incorrect' }
 UNVERIFIED_USER = { 'code': 401, 'errorText': 'Your email has not been verified yet' }
