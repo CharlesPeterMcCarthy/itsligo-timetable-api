@@ -1,4 +1,3 @@
-    #General
 UNKNOWN = { 'code': 400, 'errorText': 'An Unknown Error Occurred' }
 MISSING_DETAILS = { 'code': 401, 'errorText': 'Details are missing from the request body' }
 INVALID_AUTH_TOKEN = { 'code': 403, 'errorText': 'Invalid Auth Token' }

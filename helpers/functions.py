@@ -53,26 +53,26 @@ def GenerateAuthToken():
 def AuthUser(data):
     try:
         authTable = GetDataTable(tbl.AUTH)
-        res = authTable.get_item(Key={ 'StudentID': data['studentID'] })
+        res = authTable.get_item(Key={ 'studentID': data['studentID'] })
     except: return err.DB_QU
 
     if 'Item' in res: res = res['Item']
     else: return err.NO_AUTH_TOKEN
 
-    if 'AuthToken' in res and res['AuthToken'] == data['authToken']: return { 'AuthOk': True }
+    if 'authToken' in res and res['authToken'] == data['authToken']: return { 'authOk': True }
     return err.INVALID_AUTH_TOKEN
 
 def UpdateAuthToken(studentID, authToken):
     try:
         authTable = GetDataTable(tbl.AUTH)
         res = authTable.update_item(
-            Key={ 'StudentID': studentID },
-            UpdateExpression="set AuthToken = :a",
+            Key={ 'studentID': studentID },
+            UpdateExpression="set authToken = :a",
             ExpressionAttributeValues={ ':a': authToken },
             ReturnValues="UPDATED_NEW"
         )
     except: return err.DB_UP
-    return { 'Updated': True }
+    return { 'updated': True }
 
 def ContainsAllData(data, fields):
     return all(d in data for d in fields)

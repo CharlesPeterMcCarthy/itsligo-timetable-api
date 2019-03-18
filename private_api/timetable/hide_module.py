@@ -7,7 +7,7 @@ def Handler(event, context):
     data = json.loads(event['body'])
     if not fnc.ContainsAllData(data, ('studentID', 'authToken', 'timetableURL', 'module')): return fnc.ErrorResponse(err.MISSING_DETAILS)
     auth = fnc.AuthUser(data)
-    if 'AuthOk' not in auth or not auth['AuthOk']: return fnc.ErrorResponse(auth)
+    if 'authOk' not in auth or not auth['authOk']: return fnc.ErrorResponse(auth)
     return HideModule(data)
 
 def HideModule(data):

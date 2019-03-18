@@ -22,16 +22,16 @@ def RegisterUser(data):
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={
-            'StudentID': studentID,
-            'Email': email,
-            'Name': name,
-            'Password': hashedPass,
-            'Verified': False
+            'studentID': studentID,
+            'email': email,
+            'name': name,
+            'password': hashedPass,
+            'verified': False
         })
     except: return fnc.ErrorResponse(err.DB_IN)
 
     authRes = SaveAuthToken(studentID)
-    if 'AuthToken' not in authRes: return fnc.ErrorResponse(authRes)
+    if 'authToken' not in authRes: return fnc.ErrorResponse(authRes)
 
     confirmRes = SaveConfirmationInfo(confirmationCode, studentID)
     if confirmRes['statusCode'] != 200: return confirmRes
@@ -44,9 +44,9 @@ def SaveConfirmationInfo(confirmationCode, studentID):
     try:
         confirmTable = fnc.GetDataTable(tbl.CONFIRM)
         res = confirmTable.put_item(Item={
-            'Code': confirmationCode,
-            'StudentID': studentID,
-            'Confirmed': False
+            'code': confirmationCode,
+            'studentID': studentID,
+            'confirmed': False
         })
     except: return fnc.ErrorResponse(err.DB_IN)
     return fnc.SuccessResponse(res)
@@ -56,11 +56,11 @@ def SaveAuthToken(studentID):
     try:
         authTable = fnc.GetDataTable(tbl.AUTH)
         res = authTable.put_item(Item={
-            'StudentID': studentID,
-            'AuthToken': authToken
+            'studentID': studentID,
+            'authToken': authToken
         })
     except: return err.DB_IN
-    return { 'AuthToken': authToken }
+    return { 'authToken': authToken }
 
 def GetStudentID(email):
     return email[:9].upper() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None

@@ -1,4 +1,4 @@
-USERS = 'Users2'
+USERS = 'Users'
 AUTH = 'AuthTokens'
 DEPTS = 'Departments'
 CONFIRM = "EmailConfirmations"

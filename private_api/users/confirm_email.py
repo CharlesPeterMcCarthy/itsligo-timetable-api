@@ -10,12 +10,12 @@ def Handler(event, context):
 def CheckConfirmationCode(data):
     try:
         confirmTable = fnc.GetDataTable(tbl.CONFIRM)
-        confirmRes = confirmTable.get_item(Key={ 'Code': data['code'] })
+        confirmRes = confirmTable.get_item(Key={ 'code': data['code'] })
 
         if 'Item' in confirmRes:
             res = confirmTable.update_item(
-                Key={ 'Code': data['code'] },
-                UpdateExpression="set Confirmed = :c",
+                Key={ 'code': data['code'] },
+                UpdateExpression="set confirmed = :c",
                 ExpressionAttributeValues={ ':c': True },
                 ReturnValues="UPDATED_NEW"
             )
@@ -23,7 +23,7 @@ def CheckConfirmationCode(data):
             return fnc.ErrorResponse(err.INVALID_CONFIRM_CODE)
 
         if res['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return UpdateUserAsVerified(confirmRes['Item']['StudentID'])
+            return UpdateUserAsVerified(confirmRes['Item']['studentID'])
         else:
             return fnc.ErrorResponse(err.DB_QU)
 
@@ -34,8 +34,8 @@ def UpdateUserAsVerified(studentID):
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.update_item(
-            Key={ 'StudentID': studentID },
-            UpdateExpression="set Verified = :v",
+            Key={ 'studentID': studentID },
+            UpdateExpression="set verified = :v",
             ExpressionAttributeValues={ ':v': True },
             ReturnValues="UPDATED_NEW"
         )
