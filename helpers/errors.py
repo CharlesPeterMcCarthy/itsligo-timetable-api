@@ -18,6 +18,7 @@ INVALID_EMAIL = { 'code': 400, 'errorText': 'Email is invalid - Must be an ITSli
 
 INVALID_CONFIRM_CODE = { 'code': 400, 'errorText': 'Confirmation code is invalid' }
 
+DB = { 'code': 400, 'errorText': 'A database error occurred' }
 DB_QU = { 'code': 400, 'errorText': 'An error occurred while querying the database' }
 DB_IN = { 'code': 400, 'errorText': 'An error occurred while inserting data into the database' }
 DB_UP = { 'code': 400, 'errorText': 'An error occurred while updating data in the database' }

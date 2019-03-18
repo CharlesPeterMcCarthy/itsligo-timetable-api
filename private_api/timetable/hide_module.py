@@ -20,43 +20,51 @@ def HideModule(data):
             try:
                 matching = None
                 matching = next(filter(lambda t: t[1]['url'] == data['timetableURL'], enumerate(timetables)))
-                if matching:
-                    res = hiddenModulesTable.update_item(
-                        Key={ 'studentID': data['studentID'] },
-                        UpdateExpression="set #tim[" + str(matching[0]) + "].#mod = list_append(#tim[" + str(matching[0]) + "].#mod, :mod)",
-                        ExpressionAttributeNames={
-                            '#tim': 'timetables',
-                            '#mod': 'modules'
-                        },
-                        ExpressionAttributeValues={
-                            ':mod': [ data['module'] ]
-                         },
-                        ReturnValues="UPDATED_NEW"
-                    )
+                if matching: res = SaveModule(hiddenModulesTable, data['studentID'], matching[0], data['module'])
             except StopIteration:
-                res = hiddenModulesTable.update_item(
-                    Key={ 'studentID': data['studentID'] },
-                    UpdateExpression="set #tim = list_append(#tim, :tim)",
-                    ExpressionAttributeNames={
-                        '#tim': 'timetables'
-                    },
-                    ExpressionAttributeValues={
-                        ':tim': [{
-                            'url': data['timetableURL'],
-                            'modules': [ data['module'] ]
-                        }]
-                     },
-                    ReturnValues="UPDATED_NEW"
-                )
-
+                res = SaveTimetable(hiddenModulesTable, data['studentID'], data['timetableURL'], data['module'])
         else:
-            res = hiddenModulesTable.put_item(Item={
-                'studentID': data['studentID'],
-                'timetables': [{
-                    'url': data['timetableURL'],
-                    'modules': [ data['module'] ]
-                }]
-            })
+            res = SaveUser(hiddenModulesTable, data['studentID'], data['timetableURL'], data['module'])
     except:
-        return fnc.ErrorResponse(err.UNKNOWN)
+        return fnc.ErrorResponse(err.DB)
+
     return fnc.SuccessResponse(res)
+
+def SaveUser(table, studentID, timetableURL, module):
+    return table.put_item(Item={
+        'studentID': studentID,
+        'timetables': [{
+            'url': timetableURL,
+            'modules': [ module ]
+        }]
+    })
+
+def SaveTimetable(table, studentID, timetableURL, module):
+    return table.update_item(
+        Key={ 'studentID': studentID },
+        UpdateExpression="set #tim = list_append(#tim, :tim)",
+        ExpressionAttributeNames={
+            '#tim': 'timetables'
+        },
+        ExpressionAttributeValues={
+            ':tim': [{
+                'url': timetableURL,
+                'modules': [ module ]
+            }]
+         },
+        ReturnValues="NONE"
+    )
+
+def SaveModule(table, studentID, timetableIndex, module):
+    return table.update_item(
+        Key={ 'studentID': studentID },
+        UpdateExpression="set #tim[" + str(timetableIndex) + "].#mod = list_append(#tim[" + str(timetableIndex) + "].#mod, :mod)",
+        ExpressionAttributeNames={
+            '#tim': 'timetables',
+            '#mod': 'modules'
+        },
+        ExpressionAttributeValues={
+            ':mod': [ module ]
+         },
+        ReturnValues="UPDATED_NEW"
+    )
