@@ -1,5 +1,5 @@
 USERS = 'Users2'
-TIMETABLES = 'Timetables'
 AUTH = 'AuthTokens'
 DEPTS = 'Departments'
 CONFIRM = "EmailConfirmations"
+HIDDEN_MODS = 'HiddenModules'
