@@ -13,7 +13,7 @@ def Handler(event, context):
 def ChangeTimetable(data):
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
-        res = userTable.get_item(Key={'studentID': data['StudentID']})
+        res = userTable.get_item(Key={'studentID': data['studentID']})
 
         if 'Item' in res:
             res = userTable.update_item(

@@ -5,7 +5,7 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    if not fnc.ContainsAllData(data, ('studentID', 'authToken', 'timetableURL', 'module')): return fnc.ErrorResponse(err.MISSING_DETAILS)
+    if not fnc.ContainsAllData(data, ('studentID', 'authToken', 'timetableURL', 'modules')): return fnc.ErrorResponse(err.MISSING_DETAILS)
     auth = fnc.AuthUser(data)
     if 'authOk' not in auth or not auth['authOk']: return fnc.ErrorResponse(auth)
     return HideModule(data)
@@ -20,26 +20,26 @@ def HideModule(data):
             try:
                 matching = None
                 matching = next(filter(lambda t: t[1]['url'] == data['timetableURL'], enumerate(timetables)))
-                if matching: res = SaveModule(hiddenModulesTable, data['studentID'], matching[0], data['module'])
+                if matching: res = SaveModule(hiddenModulesTable, data['studentID'], matching[0], data['modules'])
             except StopIteration:
-                res = SaveTimetable(hiddenModulesTable, data['studentID'], data['timetableURL'], data['module'])
+                res = SaveTimetable(hiddenModulesTable, data['studentID'], data['timetableURL'], data['modules'])
         else:
-            res = SaveUser(hiddenModulesTable, data['studentID'], data['timetableURL'], data['module'])
+            res = SaveUser(hiddenModulesTable, data['studentID'], data['timetableURL'], data['modules'])
     except:
         return fnc.ErrorResponse(err.DB)
 
     return fnc.SuccessResponse(res)
 
-def SaveUser(table, studentID, timetableURL, module):
+def SaveUser(table, studentID, timetableURL, modules):
     return table.put_item(Item={
         'studentID': studentID,
         'timetables': [{
             'url': timetableURL,
-            'modules': [ module ]
+            'modules': modules
         }]
     })
 
-def SaveTimetable(table, studentID, timetableURL, module):
+def SaveTimetable(table, studentID, timetableURL, modules):
     return table.update_item(
         Key={ 'studentID': studentID },
         UpdateExpression="set #tim = list_append(#tim, :tim)",
@@ -49,13 +49,13 @@ def SaveTimetable(table, studentID, timetableURL, module):
         ExpressionAttributeValues={
             ':tim': [{
                 'url': timetableURL,
-                'modules': [ module ]
+                'modules': modules
             }]
          },
         ReturnValues="NONE"
     )
 
-def SaveModule(table, studentID, timetableIndex, module):
+def SaveModule(table, studentID, timetableIndex, modules):
     return table.update_item(
         Key={ 'studentID': studentID },
         UpdateExpression="set #tim[" + str(timetableIndex) + "].#mod = list_append(#tim[" + str(timetableIndex) + "].#mod, :mod)",
@@ -64,7 +64,7 @@ def SaveModule(table, studentID, timetableIndex, module):
             '#mod': 'modules'
         },
         ExpressionAttributeValues={
-            ':mod': [ module ]
+            ':mod': modules
          },
         ReturnValues="UPDATED_NEW"
     )

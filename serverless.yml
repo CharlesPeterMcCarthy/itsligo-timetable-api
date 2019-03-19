@@ -117,10 +117,10 @@ functions:
          path: /change-timetable
          method: post
          cors: true
-  hide_module:
-    handler: private_api/timetable/hide_module.Handler
+  hide_modules:
+    handler: private_api/timetable/hide_modules.Handler
     events:
      - http:
-         path: /hide-module
+         path: /hide-modules
          method: post
          cors: true
