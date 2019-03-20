@@ -110,8 +110,15 @@ functions:
          path: /confirm
          method: post
          cors: true
+  my_timetable:
+    handler: private_api/timetable/my_timetable.Handler
+    events:
+     - http:
+         path: /my-timetable
+         method: post
+         cors: true
   change_timetable:
-    handler: private_api/users/change_timetable.Handler
+    handler: private_api/timetable/change_timetable.Handler
     events:
      - http:
          path: /change-timetable

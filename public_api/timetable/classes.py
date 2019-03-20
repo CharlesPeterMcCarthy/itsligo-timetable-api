@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import time
 import re
 from urllib import request
@@ -7,7 +7,7 @@ import helpers.functions as fnc
 import helpers.errors as err
 
 def ParseTimetable(url):
-    startTime = datetime.datetime.strptime("09:00", "%H:%M")
+    startTime = datetime.strptime("09:00", "%H:%M")
     daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
     try:
@@ -46,8 +46,8 @@ def ParseTimetable(url):
                 'module': {},
                 'type': parts[2].text.strip(),
                 'times': {
-                    'start': parts[3].text.strip(),
-                    'end': parts[4].text.strip()
+                    'start': str(datetime.strptime(parts[3].text.strip(), "%H:%M").time()),
+                    'end': str(datetime.strptime(parts[4].text.strip(), "%H:%M").time())
                 },
                 'duration': parts[5].text.strip(),
                 'weeks': [],
