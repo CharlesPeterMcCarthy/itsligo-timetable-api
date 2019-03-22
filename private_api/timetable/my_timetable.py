@@ -17,12 +17,13 @@ def GetMyTimetable(data):
     hiddenModules = GetMyHiddenModules(data['studentID'], data['timetableURL'])
     if hiddenModules: timetable = RemoveHiddenModules(timetable, hiddenModules)
     timetable['days'] = br.FindBreaks(timetable['days'])
+    timetable['days'] = CheckConflicts(timetable['days'])
     return fnc.SuccessResponse({'timetable': timetable, 'hiddenModules': hiddenModules})
 
 def GetMyHiddenModules(studentID, timetableURL):
     try:
         hiddenModulesTable = fnc.GetDataTable(tbl.HIDDEN_MODS)
-        res = hiddenModulesTable.get_item(Key={ 'studentID': studentID })
+        res = hiddenModulesTable.get_item(Key={'studentID': studentID})
     except:
         return fnc.ErrorResponse(err.DB_QU)
 
@@ -37,13 +38,26 @@ def GetMyHiddenModules(studentID, timetableURL):
     return matchingTimetable[1]['modules']
 
 def RemoveHiddenModules(timetable, hiddenModules):
-   try:
-    for module in hiddenModules:
-        day = next(filter(lambda t: t[1]['day'] == module['day'], enumerate(timetable['days'])))
-        if day:
-            matchingModule = next(filter(lambda m: (m[1]['module']['name'] == module['name'] and m[1]['times']['start'] == module['times']['start'] and m[1]['times']['end'] == module['times']['end']), enumerate(day[1]['classes'])))
-            del day[1]['classes'][matchingModule[0]]
-   except StopIteration:
+    try:
+        for module in hiddenModules:
+            day = next(filter(lambda t: t[1]['day'] == module['day'], enumerate(timetable['days'])))
+            if day:
+                matchingModule = next(filter(lambda m: (m[1]['module']['name'] == module['name'] and m[1]['times']['start'] == module['times']['start'] and m[1]['times']['end'] == module['times']['end']), enumerate(day[1]['classes'])))
+                del day[1]['classes'][matchingModule[0]]
+    except StopIteration:
         return timetable
 
     return timetable
+
+def CheckConflicts(days):
+    for day in days:
+        classes = day['classes']
+        if not classes: continue
+        for i in range(len(classes)):
+            curClassTimes = classes[i]['times']
+            nextClassTimes = classes[i + 1]['times'] if i + 1 < len(classes) else None
+            if nextClassTimes:
+                if curClassTimes['start'] == nextClassTimes['start'] or curClassTimes['end'] == nextClassTimes['end'] or (curClassTimes['start'] < nextClassTimes['start'] and curClassTimes['end'] > nextClassTimes['start']):
+                    classes[i]['conflicting'] = True
+                    classes[i + 1]['conflicting'] = True
+    return days
