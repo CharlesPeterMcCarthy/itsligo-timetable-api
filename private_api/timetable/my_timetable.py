@@ -2,7 +2,7 @@ import json
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
-import public_api.timetable.classes as cl
+import public_api.timetable.modules as cl
 import public_api.timetable.breaks as br
 
 def Handler(event, context):
@@ -42,8 +42,8 @@ def RemoveHiddenModules(timetable, hiddenModules):
         for module in hiddenModules:
             day = next(filter(lambda t: t[1]['day'] == module['day'], enumerate(timetable['days'])))
             if day:
-                matchingModule = next(filter(lambda m: (m[1]['module']['name'] == module['name'] and m[1]['times']['start'] == module['times']['start'] and m[1]['times']['end'] == module['times']['end']), enumerate(day[1]['classes'])))
-                del day[1]['classes'][matchingModule[0]]
+                matchingModule = next(filter(lambda m: (m[1]['module']['name'] == module['name'] and m[1]['times']['start'] == module['times']['start'] and m[1]['times']['end'] == module['times']['end']), enumerate(day[1]['modules'])))
+                del day[1]['modules'][matchingModule[0]]
     except StopIteration:
         return timetable
 
@@ -51,13 +51,13 @@ def RemoveHiddenModules(timetable, hiddenModules):
 
 def CheckConflicts(days):
     for day in days:
-        classes = day['classes']
-        if not classes: continue
-        for i in range(len(classes)):
-            curClassTimes = classes[i]['times']
-            nextClassTimes = classes[i + 1]['times'] if i + 1 < len(classes) else None
-            if nextClassTimes:
-                if curClassTimes['start'] == nextClassTimes['start'] or curClassTimes['end'] == nextClassTimes['end'] or (curClassTimes['start'] < nextClassTimes['start'] and curClassTimes['end'] > nextClassTimes['start']):
-                    classes[i]['conflicting'] = True
-                    classes[i + 1]['conflicting'] = True
+        modules = day['modules']
+        if not modules: continue
+        for i in range(len(modules)):
+            curModuleTimes = modules[i]['times']
+            nextModuleTimes = modules[i + 1]['times'] if i + 1 < len(modules) else None
+            if nextModuleTimes:
+                if curModuleTimes['start'] == nextModuleTimes['start'] or curModuleTimes['end'] == nextModuleTimes['end'] or (curModuleTimes['start'] < nextModuleTimes['start'] and curModuleTimes['end'] > nextModuleTimes['start']):
+                    modules[i]['conflicting'] = True
+                    modules[i + 1]['conflicting'] = True
     return days

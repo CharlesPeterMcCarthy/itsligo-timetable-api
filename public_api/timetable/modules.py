@@ -20,28 +20,28 @@ def ParseTimetable(url):
     soup = BeautifulSoup(response, "html.parser")
     dayTables = soup.findAll('table', { 'width': None })
 
-    daysClasses = []
+    daysModules = []
     for i in range(len(dayTables)):
         day = dayTables[i]
-        classes = day.findAll('tr')
+        modules = day.findAll('tr')
 
-        if len(classes):
-            classes.pop(0) # Remove header titles
+        if len(modules):
+            modules.pop(0) # Remove header titles
         else:
-            classes = None
+            modules = None
 
-        daysClasses.append({ 'day': daysOfWeek[i], 'classes': classes})
+        daysModules.append({ 'day': daysOfWeek[i], 'modules': modules})
 
-    for i in range(len(daysClasses)):
-        day = daysClasses[i]
-        classes = []
-        if not day['classes']:
+    for i in range(len(daysModules)):
+        day = daysModules[i]
+        modules = []
+        if not day['modules']:
             continue
 
-        for cl in day['classes']:
-            parts = cl.findAll('td')
+        for mod in day['modules']:
+            parts = mod.findAll('td')
 
-            classInfo = {
+            moduleInfo = {
                 'activity': parts[0].text.strip(),
                 'module': {},
                 'type': parts[2].text.strip(),
@@ -57,15 +57,15 @@ def ParseTimetable(url):
             }
 
                 # Module Info
-            moduleInfo = parts[1].text.split('-')
-            moduleCode = moduleInfo[0].strip()
+            modInfo = parts[1].text.split('-')
+            modCode = modInfo[0].strip()
 
-            if len(moduleInfo) >= 2:
-                classInfo['module']['code'] = CheckModuleCode(moduleCode)
-                classInfo['module']['name'] = moduleInfo[1].strip() if len(moduleInfo) == 2 else '-'.join(moduleInfo[-2:])
+            if len(modInfo) >= 2:
+                moduleInfo['module']['code'] = CheckModuleCode(modCode)
+                moduleInfo['module']['name'] = modInfo[1].strip() if len(modInfo) == 2 else '-'.join(modInfo[-2:])
             else:
-                classInfo['module']['code'] = None
-                classInfo['module']['name'] = moduleCode
+                moduleInfo['module']['code'] = None
+                moduleInfo['module']['name'] = modCode
 
                 # Weeks
             weeksInfo = parts[6].text.split(',')
@@ -75,9 +75,9 @@ def ParseTimetable(url):
 
                 if RangeOfWeeks(wi):
                     startAndEnd = wi.split('-')
-                    classInfo['weeks'].append({ 'start': startAndEnd[0], 'end': startAndEnd[1] })
+                    moduleInfo['weeks'].append({ 'start': startAndEnd[0], 'end': startAndEnd[1] })
                 elif SolidWeek(wi):
-                    classInfo['weeks'].append({ 'lone': wi })
+                    moduleInfo['weeks'].append({ 'lone': wi })
 
                 # Room Info
             if len(parts[7].text.strip()):
@@ -99,7 +99,7 @@ def ParseTimetable(url):
 
                     roomInfo['type'] = re.split(r'\([0-9]*\)|[A-Z]\d{4} ?-', room)[1].strip()
 
-                    classInfo['rooms'].append(roomInfo)
+                    moduleInfo['rooms'].append(roomInfo)
 
             if len(parts[9].text.strip()):
                 groups = parts[9].text.strip().split(';')
@@ -111,15 +111,15 @@ def ParseTimetable(url):
                             'year': CheckCourseYear(groupsInfo[2].strip())
                         }
 
-                classInfo['groups'] = groups
+                moduleInfo['groups'] = groups
 
-            classes.append(classInfo)
-        daysClasses[i]['classes'] = classes
+            modules.append(moduleInfo)
+        daysModules[i]['modules'] = modules
 
-    return { 'days': daysClasses }
+    return { 'days': daysModules }
 
-def CheckModuleCode(moduleCode):
-    return moduleCode if re.match(r'[A-Z]{4}\d{5}', moduleCode) else None
+def CheckModuleCode(modCode):
+    return modCode if re.match(r'[A-Z]{4}\d{5}', modCode) else None
 
 def CheckRoomCode(roomCode):
     return roomCode if re.match(r'[A-Z]\d{4}', roomCode) else None
