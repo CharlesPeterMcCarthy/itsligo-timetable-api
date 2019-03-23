@@ -131,3 +131,10 @@ functions:
          path: /hide-modules
          method: post
          cors: true
+  admin_get_users:
+    handler: private_api/admin/get_users.Handler
+    events:
+     - http:
+         path: /admin/get-users
+         method: post
+         cors: true
