@@ -1,6 +1,7 @@
 import json
 import re
 import random
+import datetime
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
@@ -16,6 +17,7 @@ def RegisterUser(data):
     name = data['name']
     hashedPass = fnc.EncryptPassword(data['password'])
     confirmationCode = GenerateConfirmationCode()
+    registerAt = datetime.datetime.now().isoformat()
 
     if not studentID: return fnc.ErrorResponse(err.INVALID_EMAIL)
 
@@ -26,7 +28,10 @@ def RegisterUser(data):
             'email': email,
             'name': name,
             'password': hashedPass,
-            'verified': False
+            'verified': False,
+            'times': {
+                'registerAt': registerAt
+            }
         })
     except: return fnc.ErrorResponse(err.DB_IN)
 
@@ -63,6 +68,7 @@ def SaveAuthToken(studentID):
     return { 'authToken': authToken }
 
 def GetStudentID(email):
+    return "S00112233"
     return email[:9].upper() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None
 
 def GenerateConfirmationCode():

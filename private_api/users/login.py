@@ -1,4 +1,5 @@
 import json
+import datetime
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
@@ -26,4 +27,22 @@ def CheckLoginDetails(data):
     authToken = fnc.GenerateAuthToken()
     authRes = fnc.UpdateAuthToken(studentID, authToken)
 
+    UpdateLoginDatetime(studentID)
+
     return fnc.SuccessResponse({ 'user': res, 'authToken': authToken }) if 'updated' in authRes and authRes['updated'] else fnc.ErrorResponse(authRes)
+
+def UpdateLoginDatetime(studentID):
+    loginAt = datetime.datetime.now().isoformat()
+
+    try:
+        userTable = fnc.GetDataTable(tbl.USERS)
+        res = userTable.update_item(
+            Key={ 'studentID': studentID },
+            UpdateExpression="set #t.#l = :d",
+            ExpressionAttributeNames={ '#t': 'times', '#l': 'lastLogin' },
+            ExpressionAttributeValues={ ':d': loginAt },
+            ReturnValues="NONE"
+        )
+    except:
+        res = err.DB_UP
+    return res
