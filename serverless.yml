@@ -131,6 +131,13 @@ functions:
          path: /hide-modules
          method: post
          cors: true
+  restore_modules:
+    handler: private_api/timetable/restore_modules.Handler
+    events:
+     - http:
+         path: /restore-modules
+         method: post
+         cors: true
   # admin
   confirm_admin:
     handler: private_api/admin/confirm_admin.Handler
