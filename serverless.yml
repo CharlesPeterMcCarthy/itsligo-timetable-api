@@ -131,6 +131,14 @@ functions:
          path: /hide-modules
          method: post
          cors: true
+  # admin
+  confirm_admin:
+    handler: private_api/admin/confirm_admin.Handler
+    events:
+     - http:
+         path: /admin/confirm
+         method: post
+         cors: true
   admin_get_users:
     handler: private_api/admin/get_users.Handler
     events:
