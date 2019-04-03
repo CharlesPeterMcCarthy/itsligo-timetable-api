@@ -5,7 +5,7 @@ NO_AUTH_TOKEN = { 'code': 403, 'errorText': 'No Auth Token associated with your 
 
 NO_TIMETABLE_RETURN_DATA = { 'code': 401, 'errorText': 'Modules, breaks or both must be included' }
 
-INVALID_STUDENTID = { 'code': 401, 'errorText': 'No user matches that Student ID' }
+INVALID_USERNAME = { 'code': 401, 'errorText': 'No account matches that username' }
 WRONG_PASSWORD = { 'code': 401, 'errorText': 'Password is Incorrect' }
 UNVERIFIED_USER = { 'code': 401, 'errorText': 'Your email has not been verified yet' }
 

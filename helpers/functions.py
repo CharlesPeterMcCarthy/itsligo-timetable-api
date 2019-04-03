@@ -53,7 +53,7 @@ def GenerateAuthToken():
 def AuthUser(data):
     try:
         authTable = GetDataTable(tbl.AUTH)
-        res = authTable.get_item(Key={ 'studentID': data['studentID'] })
+        res = authTable.get_item(Key={'username': data['username']})
     except: return err.DB_QU
 
     if 'Item' in res: res = res['Item']
@@ -62,11 +62,11 @@ def AuthUser(data):
     if 'authToken' in res and res['authToken'] == data['authToken']: return { 'authOk': True }
     return err.INVALID_AUTH_TOKEN
 
-def UpdateAuthToken(studentID, authToken):
+def UpdateAuthToken(username, authToken):
     try:
         authTable = GetDataTable(tbl.AUTH)
         res = authTable.update_item(
-            Key={ 'studentID': studentID },
+            Key={ 'username': username },
             UpdateExpression="set authToken = :a",
             ExpressionAttributeValues={ ':a': authToken },
             ReturnValues="UPDATED_NEW"

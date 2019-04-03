@@ -6,18 +6,18 @@ import helpers.errors as err
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return CheckLoginDetails(data) if fnc.ContainsAllData(data, ('studentID', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
+    return CheckLoginDetails(data) if fnc.ContainsAllData(data, ('username', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def CheckLoginDetails(data):
-    studentID = data['studentID'].upper()
+    username = data['username']
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
-        res = userTable.get_item(Key={ 'studentID': studentID })
+        res = userTable.get_item(Key={'username': username})
     except: return fnc.ErrorResponse(err.DB_QU)
 
     if 'Item' in res: res = res['Item']
-    else: return fnc.ErrorResponse(err.INVALID_STUDENTID)
+    else: return fnc.ErrorResponse(err.INVALID_USERNAME)
 
     if not res['verified']: return fnc.ErrorResponse(err.UNVERIFIED_USER)
 
@@ -25,22 +25,22 @@ def CheckLoginDetails(data):
     else: return fnc.ErrorResponse(err.WRONG_PASSWORD)
 
     authToken = fnc.GenerateAuthToken()
-    authRes = fnc.UpdateAuthToken(studentID, authToken)
+    authRes = fnc.UpdateAuthToken(username, authToken)
 
-    UpdateLoginDatetime(studentID)
+    UpdateLoginDatetime(username)
 
-    return fnc.SuccessResponse({ 'user': res, 'authToken': authToken }) if 'updated' in authRes and authRes['updated'] else fnc.ErrorResponse(authRes)
+    return fnc.SuccessResponse({'user': res, 'authToken': authToken}) if 'updated' in authRes and authRes['updated'] else fnc.ErrorResponse(authRes)
 
-def UpdateLoginDatetime(studentID):
+def UpdateLoginDatetime(username):
     loginAt = datetime.datetime.now().isoformat()
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.update_item(
-            Key={ 'studentID': studentID },
+            Key={'username': username},
             UpdateExpression="set #t.#l = :d",
-            ExpressionAttributeNames={ '#t': 'times', '#l': 'lastLogin' },
-            ExpressionAttributeValues={ ':d': loginAt },
+            ExpressionAttributeNames={'#t': 'times', '#l': 'lastLogin'},
+            ExpressionAttributeValues={':d': loginAt},
             ReturnValues="NONE"
         )
     except:

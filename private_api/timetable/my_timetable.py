@@ -7,23 +7,23 @@ import public_api.timetable.breaks as br
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    if not fnc.ContainsAllData(data, ('studentID', 'authToken', 'timetableURL')): return fnc.ErrorResponse(err.MISSING_DETAILS)
+    if not fnc.ContainsAllData(data, ('username', 'authToken', 'timetableURL')): return fnc.ErrorResponse(err.MISSING_DETAILS)
     auth = fnc.AuthUser(data)
     if 'authOk' not in auth or not auth['authOk']: return fnc.ErrorResponse(auth)
     return GetMyTimetable(data)
 
 def GetMyTimetable(data):
     timetable = cl.ParseTimetable(data['timetableURL'])
-    hiddenModules = GetMyHiddenModules(data['studentID'], data['timetableURL'])
+    hiddenModules = GetMyHiddenModules(data['username'], data['timetableURL'])
     if hiddenModules: timetable = RemoveHiddenModules(timetable, hiddenModules)
     timetable['days'] = br.FindBreaks(timetable['days'])
     timetable['days'] = CheckConflicts(timetable['days'])
     return fnc.SuccessResponse({'timetable': timetable, 'hiddenModules': hiddenModules})
 
-def GetMyHiddenModules(studentID, timetableURL):
+def GetMyHiddenModules(username, timetableURL):
     try:
         hiddenModulesTable = fnc.GetDataTable(tbl.HIDDEN_MODS)
-        res = hiddenModulesTable.get_item(Key={'studentID': studentID})
+        res = hiddenModulesTable.get_item(Key={'username': username})
     except:
         return fnc.ErrorResponse(err.DB_QU)
 

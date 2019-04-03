@@ -27,20 +27,20 @@ def CheckConfirmationCode(data):
             return fnc.ErrorResponse(err.INVALID_CONFIRM_CODE)
 
         if res['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return UpdateUserAsVerified(confirmRes['Item']['studentID'])
+            return UpdateUserAsVerified(confirmRes['Item']['username'])
         else:
             return fnc.ErrorResponse(err.DB_QU)
 
     except:
         return fnc.ErrorResponse(err.DB_UP)
 
-def UpdateUserAsVerified(studentID):
+def UpdateUserAsVerified(username):
     verifiedAt = datetime.datetime.now().isoformat()
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.update_item(
-            Key={ 'studentID': studentID },
+            Key={ 'username': username },
             UpdateExpression="set #v = :v, #t.#va = :va",
             ExpressionAttributeNames={ '#v': 'verified', '#t': 'times', '#va': 'verifiedAt' },
             ExpressionAttributeValues={ ':v': True, ':va': verifiedAt },
