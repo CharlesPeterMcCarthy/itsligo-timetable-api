@@ -9,9 +9,45 @@ import emails.confirm_email as mail
 
 def Handler(event, context):
     data = json.loads(event['body'])
-    return RegisterUser(data) if fnc.ContainsAllData(data, ('studentEmail', 'name', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
+    if 'open' not in data:
+        return fnc.ErrorResponse(err.MISSING_DETAILS)
+    elif not data['open'] and fnc.ContainsAllData(data, ('studentEmail', 'name', 'password')):
+        return ClosedRegister(data)
+    elif data['open'] and fnc.ContainsAllData(data, ('username', 'password')):
+        return OpenRegister(data)
+    else:
+        return fnc.ErrorResponse(err.MISSING_DETAILS)
 
-def RegisterUser(data):
+        ##### OPEN REGISTRATION #####
+
+def OpenRegister(data):
+    username = data['username']
+    hashedPass = fnc.EncryptPassword(data['password'])
+    registerAt = datetime.datetime.now().isoformat()
+
+    try:
+        userTable = fnc.GetDataTable(tbl.USERS)
+        res = userTable.put_item(Item={
+            'username': username,
+            'password': hashedPass,
+            'verified': False,
+            'open': True,
+            'times': {
+                'registerAt': registerAt
+            }
+        })
+    except:
+        return fnc.ErrorResponse(err.DB_IN)
+
+    authRes = SaveAuthToken(username)
+    if 'authToken' not in authRes:
+        return fnc.ErrorResponse(authRes)
+
+    return fnc.SuccessResponse(res)
+
+        ##### CLOSED REGISTRATION #####
+
+def ClosedRegister(data):
     email = data['studentEmail'].lower()
     studentID = GetStudentID(email)
     name = data['name']
@@ -24,16 +60,18 @@ def RegisterUser(data):
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={
-            'studentID': studentID,
+            'username': studentID,
             'email': email,
             'name': name,
             'password': hashedPass,
             'verified': False,
+            'open': False,
             'times': {
                 'registerAt': registerAt
             }
         })
-    except: return fnc.ErrorResponse(err.DB_IN)
+    except:
+        return fnc.ErrorResponse(err.DB_IN)
 
     authRes = SaveAuthToken(studentID)
     if 'authToken' not in authRes: return fnc.ErrorResponse(authRes)
@@ -50,25 +88,26 @@ def SaveConfirmationInfo(confirmationCode, studentID):
         confirmTable = fnc.GetDataTable(tbl.CONFIRM)
         res = confirmTable.put_item(Item={
             'code': confirmationCode,
-            'studentID': studentID,
+            'username': studentID,
             'confirmed': False
         })
     except: return fnc.ErrorResponse(err.DB_IN)
     return fnc.SuccessResponse(res)
 
-def SaveAuthToken(studentID):
+def SaveAuthToken(username):
     authToken = fnc.GenerateAuthToken()
+
     try:
         authTable = fnc.GetDataTable(tbl.AUTH)
         res = authTable.put_item(Item={
-            'studentID': studentID,
+            'username': username,
             'authToken': authToken
         })
-    except: return err.DB_IN
+    except:
+        return err.DB_IN
     return { 'authToken': authToken }
 
 def GetStudentID(email):
-    return "S00112233"
     return email[:9].upper() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None
 
 def GenerateConfirmationCode():
