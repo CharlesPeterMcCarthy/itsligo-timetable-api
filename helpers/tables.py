@@ -1,5 +1,5 @@
-USERS = 'Users'
-AUTH = 'AuthTokens'
-DEPTS = 'Departments'
-CONFIRM = "EmailConfirmations"
-HIDDEN_MODS = 'HiddenModules'
+USERS = 'ITS_TIMETABLE_Users'
+AUTH = 'ITS_TIMETABLE_AuthTokens'
+DEPTS = 'ITS_TIMETABLE_Departments'
+CONFIRM = "ITS_TIMETABLE_EmailConfirmations"
+HIDDEN_MODS = 'ITS_TIMETABLE_HiddenModules'
