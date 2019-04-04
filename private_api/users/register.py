@@ -21,7 +21,8 @@ def Handler(event, context):
         ##### OPEN REGISTRATION #####
 
 def OpenRegister(data):
-    username = data['username']
+    displayUsername = data['username']
+    username = displayUsername.lower()
     hashedPass = fnc.EncryptPassword(data['password'])
     registerAt = datetime.datetime.now().isoformat()
 
@@ -29,8 +30,9 @@ def OpenRegister(data):
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={
             'username': username,
+            'displayUsername': displayUsername,
             'password': hashedPass,
-            'verified': False,
+            'verified': True,
             'open': True,
             'times': {
                 'registerAt': registerAt

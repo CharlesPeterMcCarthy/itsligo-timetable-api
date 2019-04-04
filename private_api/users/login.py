@@ -9,7 +9,7 @@ def Handler(event, context):
     return CheckLoginDetails(data) if fnc.ContainsAllData(data, ('username', 'password')) else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def CheckLoginDetails(data):
-    username = data['username']
+    username = data['username'].lower()
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
