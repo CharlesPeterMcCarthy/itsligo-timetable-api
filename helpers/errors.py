@@ -8,6 +8,8 @@ NO_TIMETABLE_RETURN_DATA = { 'code': 401, 'errorText': 'Modules, breaks or both 
 INVALID_USERNAME = { 'code': 401, 'errorText': 'No account matches that username' }
 WRONG_PASSWORD = { 'code': 401, 'errorText': 'Password is Incorrect' }
 UNVERIFIED_USER = { 'code': 401, 'errorText': 'Your email has not been verified yet' }
+USERNAME_EXISTS = { 'code': 403, 'errorText': 'An account with this username already exists' }
+EMAIL_EXISTS = { 'code': 403, 'errorText': 'An account with this email already exists' }
 
 NOT_ADMIN = { 'code': 401, 'errorText': 'Not an Admin account' }
 

@@ -4,14 +4,14 @@ import helpers.errors as err
 import emails.email_info as info
 from botocore.exceptions import ClientError
 
-def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL, CONFIRM_CODE):
+def SendConfirmEmail(RECIPIENT_EMAIL, CONFIRM_CODE):
     SENDER = FormSenderDetails(info.SENDER_NAME, info.SENDER_EMAIL)
     CONFIRM_URL = ConfigureConfirmationURL(CONFIRM_CODE)
     SUBJECT = "ITSligo Timetable"
     CHARSET = "UTF-8"
 
     BODY_TEXT = (
-        "Welcome" + RECIPIENT_NAME + "\r\n"
+        "Welcome!" + "\r\n"
         "Please confirm your email by copying and pasting the "
         "following URL into your browser: \r\n" + CONFIRM_URL
     )
@@ -20,7 +20,7 @@ def SendConfirmEmail(RECIPIENT_NAME, RECIPIENT_EMAIL, CONFIRM_CODE):
         <head></head>\
         <body>\
             <h2>ITSligo Timetable</h2>\
-            <p>Welcome " + RECIPIENT_NAME + "!\
+            <p>Welcome!\
             <p>Please confirm your email by clicking on the following URL: </p>\
             <a href='" + CONFIRM_URL + "'>Confirm Email</a>\
         </body>\

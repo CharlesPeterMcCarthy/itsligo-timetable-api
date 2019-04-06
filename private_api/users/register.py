@@ -11,12 +11,20 @@ def Handler(event, context):
     data = json.loads(event['body'])
     if 'open' not in data:
         return fnc.ErrorResponse(err.MISSING_DETAILS)
-    elif not data['open'] and fnc.ContainsAllData(data, ('studentEmail', 'name', 'password')):
+    elif not data['open'] and fnc.ContainsAllData(data, ('studentEmail', 'password')):
         return ClosedRegister(data)
     elif data['open'] and fnc.ContainsAllData(data, ('username', 'password')):
         return OpenRegister(data)
     else:
         return fnc.ErrorResponse(err.MISSING_DETAILS)
+
+def CheckUsernameExists(username, open):
+    try:
+        userTable = fnc.GetDataTable(tbl.USERS)
+        res = userTable.get_item(Key={'username': username})
+    except:
+        return err.DB_QU
+    return (err.USERNAME_EXISTS if open else err.EMAIL_EXISTS) if 'Item' in res else {'exists': False}
 
         ##### OPEN REGISTRATION #####
 
@@ -25,6 +33,10 @@ def OpenRegister(data):
     username = displayUsername.lower()
     hashedPass = fnc.EncryptPassword(data['password'])
     registerAt = datetime.datetime.now().isoformat()
+
+    check = CheckUsernameExists(username, True)
+    if 'errorText' in check:
+        return fnc.ErrorResponse(check)
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
@@ -52,19 +64,21 @@ def OpenRegister(data):
 def ClosedRegister(data):
     email = data['studentEmail'].lower()
     studentID = GetStudentID(email)
-    name = data['name']
     hashedPass = fnc.EncryptPassword(data['password'])
     confirmationCode = GenerateConfirmationCode()
     registerAt = datetime.datetime.now().isoformat()
 
     if not studentID: return fnc.ErrorResponse(err.INVALID_EMAIL)
 
+    check = CheckUsernameExists(studentID, False)
+    if 'errorText' in check:
+        return fnc.ErrorResponse(check)
+
     try:
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={
             'username': studentID,
             'email': email,
-            'name': name,
             'password': hashedPass,
             'verified': False,
             'open': False,
@@ -81,7 +95,7 @@ def ClosedRegister(data):
     confirmRes = SaveConfirmationInfo(confirmationCode, studentID)
     if confirmRes['statusCode'] != 200: return confirmRes
 
-    emailRes = mail.SendConfirmEmail(name, email, confirmationCode)
+    emailRes = mail.SendConfirmEmail(email, confirmationCode)
 
     return fnc.SuccessResponse(res) if emailRes['statusCode'] == 200 else emailRes
 
@@ -110,7 +124,7 @@ def SaveAuthToken(username):
     return { 'authToken': authToken }
 
 def GetStudentID(email):
-    return email[:9].upper() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None
+    return email[:9].lower() if re.fullmatch(r'[s/S]\d{8}@mail.itsligo.ie', email) else None
 
 def GenerateConfirmationCode():
     return str("%032x" % random.getrandbits(128))
