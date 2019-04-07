@@ -35,7 +35,14 @@ def GetMyHiddenModules(username, timetableURL):
     except StopIteration:
         return None
 
-    return matchingTimetable[1]['modules']
+    modules = matchingTimetable[1]['modules']
+    CheckForEmptyModuleNames(modules)
+
+    return modules
+
+def CheckForEmptyModuleNames(modules):
+    for module in modules:
+        if module['name'] == ' ': module['name'] = ''
 
 def RemoveHiddenModules(timetable, hiddenModules):
     try:

@@ -13,25 +13,36 @@ def Handler(event, context):
 def HideModule(data):
     username = data['username']
     timetableURL = data['timetableURL']
+    modules = data['modules']
+
+    CheckForEmptyModuleNames(modules)
 
     try:
         hiddenModulesTable = fnc.GetDataTable(tbl.HIDDEN_MODS)
         res = hiddenModulesTable.get_item(Key={'username': username})
-
-        if 'Item' in res:
-            timetables = res['Item']['timetables']
-            try:
-                matching = None
-                matching = next(filter(lambda t: t[1]['url'] == timetableURL, enumerate(timetables)))
-                if matching: res = SaveModule(hiddenModulesTable, username, matching[0], data['modules'])
-            except StopIteration:
-                res = SaveTimetable(hiddenModulesTable, username, timetableURL, data['modules'])
-        else:
-            res = SaveUser(hiddenModulesTable, username, timetableURL, data['modules'])
     except:
-        return fnc.ErrorResponse(err.DB)
+        return fnc.ErrorResponse(err.DB_QU)
+
+    #try:
+    if 'Item' in res:
+        timetables = res['Item']['timetables']
+        try:
+            matching = None
+            matching = next(filter(lambda t: t[1]['url'] == timetableURL, enumerate(timetables)))
+            if matching: res = SaveModule(hiddenModulesTable, username, matching[0], modules)
+        except StopIteration:
+            res = SaveTimetable(hiddenModulesTable, username, timetableURL, modules)
+    else:
+        res = SaveUser(hiddenModulesTable, username, timetableURL, modules)
+    # except:
+    #     return fnc.ErrorResponse(err.DB_IN)
+
 
     return fnc.SuccessResponse(res)
+
+def CheckForEmptyModuleNames(modules):
+    for module in modules:
+        if module['name'] == '': module['name'] = ' ' 
 
 def SaveUser(table, username, timetableURL, modules):
     return table.put_item(Item={
