@@ -1,8 +1,8 @@
 import json
-import datetime
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
+import helpers.datetime as dt
 
 def Handler(event, context):
     data = json.loads(event['body'])
@@ -32,7 +32,7 @@ def CheckLoginDetails(data):
     return fnc.SuccessResponse({'user': res, 'authToken': authToken}) if 'updated' in authRes and authRes['updated'] else fnc.ErrorResponse(authRes)
 
 def UpdateLoginDatetime(username):
-    loginAt = datetime.datetime.now().isoformat()
+    loginAt = dt.GetCurrentDatetime()
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)

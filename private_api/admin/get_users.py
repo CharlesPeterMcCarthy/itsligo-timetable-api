@@ -18,7 +18,7 @@ def GetUsers():
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.scan(
             FilterExpression='accountType <> :accType',
-            ProjectionExpression='#nm, username, verified, timetableURL',
+            ProjectionExpression='#nm, username, displayUsername, verified, timetableURL, times.registerAt',
             ExpressionAttributeValues={
                 ':accType': 'Admin',
             },

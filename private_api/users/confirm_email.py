@@ -1,15 +1,15 @@
 import json
-import datetime
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
+import helpers.datetime as dt
 
 def Handler(event, context):
     data = json.loads(event['body'])
     return CheckConfirmationCode(data) if 'code' in data else fnc.ErrorResponse(err.MISSING_DETAILS)
 
 def CheckConfirmationCode(data):
-    confirmedAt = datetime.datetime.now().isoformat()
+    confirmedAt = dt.GetCurrentDatetime()
 
     try:
         confirmTable = fnc.GetDataTable(tbl.CONFIRM)
@@ -35,7 +35,7 @@ def CheckConfirmationCode(data):
         return fnc.ErrorResponse(err.DB_UP)
 
 def UpdateUserAsVerified(username):
-    verifiedAt = datetime.datetime.now().isoformat()
+    verifiedAt = dt.GetCurrentDatetime()
 
     try:
         userTable = fnc.GetDataTable(tbl.USERS)

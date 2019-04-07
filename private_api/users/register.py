@@ -1,10 +1,10 @@
 import json
 import re
 import random
-import datetime
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
+import helpers.datetime as dt
 import emails.confirm_email as mail
 
 def Handler(event, context):
@@ -32,7 +32,7 @@ def OpenRegister(data):
     displayUsername = data['username']
     username = displayUsername.lower()
     hashedPass = fnc.EncryptPassword(data['password'])
-    registerAt = datetime.datetime.now().isoformat()
+    registerAt = dt.GetCurrentDatetime()
 
     check = CheckUsernameExists(username, True)
     if 'errorText' in check:
@@ -66,7 +66,7 @@ def ClosedRegister(data):
     studentID = GetStudentID(email)
     hashedPass = fnc.EncryptPassword(data['password'])
     confirmationCode = GenerateConfirmationCode()
-    registerAt = datetime.datetime.now().isoformat()
+    registerAt = dt.GetCurrentDatetime()
 
     if not studentID: return fnc.ErrorResponse(err.INVALID_EMAIL)
 
