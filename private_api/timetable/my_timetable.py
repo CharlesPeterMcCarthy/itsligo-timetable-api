@@ -13,12 +13,19 @@ def Handler(event, context):
     return GetMyTimetable(data)
 
 def GetMyTimetable(data):
-    timetable = cl.ParseTimetable(data['timetableURL'])
-    hiddenModules = GetMyHiddenModules(data['username'], data['timetableURL'])
+    username = data['username']
+    timetableURL = data['timetableURL']
+
+    timetable = cl.ParseTimetable(timetableURL)
+    hiddenModules = GetMyHiddenModules(username, timetableURL)
     if hiddenModules: timetable = RemoveHiddenModules(timetable, hiddenModules)
     timetable['days'] = br.FindBreaks(timetable['days'])
     timetable['days'] = CheckConflicts(timetable['days'])
-    return fnc.SuccessResponse({'timetable': timetable, 'hiddenModules': hiddenModules})
+
+    authToken = fnc.GenerateAuthToken()
+    authRes = fnc.UpdateAuthToken(username, authToken)
+
+    return fnc.SuccessResponse({'authToken': authToken, 'timetable': timetable, 'hiddenModules': hiddenModules})
 
 def GetMyHiddenModules(username, timetableURL):
     try:

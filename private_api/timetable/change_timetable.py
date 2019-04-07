@@ -24,7 +24,11 @@ def ChangeTimetable(data):
                 ExpressionAttributeValues={':t': data['timetableURL']},
                 ReturnValues="UPDATED_NEW"
             )
-            return fnc.SuccessResponse(res) if res['ResponseMetadata']['HTTPStatusCode'] == 200 else fnc.ErrorResponse(err.TIMETABLE_UPDATE)
+
+            authToken = fnc.GenerateAuthToken()
+            authRes = fnc.UpdateAuthToken(username, authToken)
+
+            return fnc.SuccessResponse({'authToken': authToken}) if res['ResponseMetadata']['HTTPStatusCode'] == 200 else fnc.ErrorResponse(err.TIMETABLE_UPDATE)
 
         else:
             return fnc.ErrorResponse(err.INVALID_USERNAME)

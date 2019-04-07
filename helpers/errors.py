@@ -1,7 +1,7 @@
 UNKNOWN = { 'code': 400, 'errorText': 'An Unknown Error Occurred' }
 MISSING_DETAILS = { 'code': 401, 'errorText': 'Details are missing from the request body' }
-INVALID_AUTH_TOKEN = { 'code': 403, 'errorText': 'Invalid Auth Token' }
-NO_AUTH_TOKEN = { 'code': 403, 'errorText': 'No Auth Token associated with your account' }
+INVALID_AUTH_TOKEN = { 'code': 403, 'errorText': 'Invalid Auth Token', 'forceLogout': True }
+NO_AUTH_TOKEN = { 'code': 403, 'errorText': 'No Auth Token associated with your account', 'forceLogout': True }
 
 NO_TIMETABLE_RETURN_DATA = { 'code': 401, 'errorText': 'Modules, breaks or both must be included' }
 

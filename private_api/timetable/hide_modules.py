@@ -23,26 +23,28 @@ def HideModule(data):
     except:
         return fnc.ErrorResponse(err.DB_QU)
 
-    #try:
-    if 'Item' in res:
-        timetables = res['Item']['timetables']
-        try:
-            matching = None
-            matching = next(filter(lambda t: t[1]['url'] == timetableURL, enumerate(timetables)))
-            if matching: res = SaveModule(hiddenModulesTable, username, matching[0], modules)
-        except StopIteration:
-            res = SaveTimetable(hiddenModulesTable, username, timetableURL, modules)
-    else:
-        res = SaveUser(hiddenModulesTable, username, timetableURL, modules)
-    # except:
-    #     return fnc.ErrorResponse(err.DB_IN)
+    try:
+        if 'Item' in res:
+            timetables = res['Item']['timetables']
+            try:
+                matching = None
+                matching = next(filter(lambda t: t[1]['url'] == timetableURL, enumerate(timetables)))
+                if matching: res = SaveModule(hiddenModulesTable, username, matching[0], modules)
+            except StopIteration:
+                res = SaveTimetable(hiddenModulesTable, username, timetableURL, modules)
+        else:
+            res = SaveUser(hiddenModulesTable, username, timetableURL, modules)
+    except:
+        return fnc.ErrorResponse(err.DB_IN)
 
+    authToken = fnc.GenerateAuthToken()
+    authRes = fnc.UpdateAuthToken(username, authToken)
 
-    return fnc.SuccessResponse(res)
+    return fnc.SuccessResponse({'authToken': authToken})
 
 def CheckForEmptyModuleNames(modules):
     for module in modules:
-        if module['name'] == '': module['name'] = ' ' 
+        if module['name'] == '': module['name'] = ' '
 
 def SaveUser(table, username, timetableURL, modules):
     return table.put_item(Item={

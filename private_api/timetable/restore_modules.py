@@ -28,7 +28,10 @@ def RestoreModules(data):
     except StopIteration:
         return fnc.ErrorResponse(err.UNKNOWN)
 
-    return fnc.SuccessResponse(res)
+    authToken = fnc.GenerateAuthToken()
+    authRes = fnc.UpdateAuthToken(username, authToken)
+
+    return fnc.SuccessResponse({'authToken': authToken})
 
 def UpdateRecord(table, username, index):
     return table.update_item(

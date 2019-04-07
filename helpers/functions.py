@@ -35,7 +35,7 @@ def SuccessResponse(body):
     return FormResponse(200, body)
 
 def ErrorResponse(error):
-    return FormResponse(error['code'], { 'errorText': error['errorText'] })
+    return FormResponse(error['code'], error)
 
 def FormResponse(code, body):
     return {
@@ -51,9 +51,11 @@ def GenerateAuthToken():
     return str("%032x" % random.getrandbits(128))
 
 def AuthUser(data):
+    username = data['username'].lower()
+
     try:
         authTable = GetDataTable(tbl.AUTH)
-        res = authTable.get_item(Key={'username': data['username']})
+        res = authTable.get_item(Key={'username': username})
     except: return err.DB_QU
 
     if 'Item' in res: res = res['Item']
@@ -63,6 +65,8 @@ def AuthUser(data):
     return err.INVALID_AUTH_TOKEN
 
 def UpdateAuthToken(username, authToken):
+    username = username.lower()
+
     try:
         authTable = GetDataTable(tbl.AUTH)
         res = authTable.update_item(
