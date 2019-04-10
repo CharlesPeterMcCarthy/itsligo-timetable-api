@@ -25,7 +25,9 @@ def GetMyTimetable(data):
     authToken = fnc.GenerateAuthToken()
     authRes = fnc.UpdateAuthToken(username, authToken)
 
-    return fnc.SuccessResponse({'authToken': authToken, 'timetable': timetable, 'hiddenModules': hiddenModules})
+    lastActionRes = fnc.UpdateLastAction(username)
+
+    return fnc.SuccessResponse({'authToken': authToken, 'timetable': timetable, 'hiddenModules': hiddenModules, 'lastActionRes': lastActionRes})
 
 def GetMyHiddenModules(username, timetableURL):
     try:

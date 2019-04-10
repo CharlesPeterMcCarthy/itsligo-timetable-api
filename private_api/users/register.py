@@ -78,6 +78,7 @@ def ClosedRegister(data):
         userTable = fnc.GetDataTable(tbl.USERS)
         res = userTable.put_item(Item={
             'username': studentID,
+            'displayUsername': studentID,
             'email': email,
             'password': hashedPass,
             'verified': False,

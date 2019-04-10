@@ -4,6 +4,7 @@ import json
 import random
 import helpers.tables as tbl
 import helpers.errors as err
+import helpers.datetime as dt
 from passlib.context import CryptContext
 
 def DecimalDefault(obj):
@@ -74,6 +75,22 @@ def UpdateAuthToken(username, authToken):
             UpdateExpression="set authToken = :a",
             ExpressionAttributeValues={ ':a': authToken },
             ReturnValues="UPDATED_NEW"
+        )
+    except: return err.DB_UP
+    return { 'updated': True }
+
+def UpdateLastAction(username):
+    username = username.lower()
+    lastAction = dt.GetCurrentDatetime()
+
+    try:
+        userTable = GetDataTable(tbl.USERS)
+        res = userTable.update_item(
+            Key={'username': username},
+            UpdateExpression="set #t.#l = :d",
+            ExpressionAttributeNames={'#t': 'times', '#l': 'lastAction'},
+            ExpressionAttributeValues={':d': lastAction},
+            ReturnValues="NONE"
         )
     except: return err.DB_UP
     return { 'updated': True }

@@ -12,11 +12,13 @@ provider:
       Action:
         - ses:SendEmail
         - ses:SendRawEmail
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
       Resource: "*"
-
-package:
-  include:
-    - functions/timetable/**
 
 functions:
   # Public API
