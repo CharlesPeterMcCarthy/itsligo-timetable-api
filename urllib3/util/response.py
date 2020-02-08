@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from six.moves import http_client as httplib
+from ..packages.six.moves import http_client as httplib
 
 from ..exceptions import HeaderParsingError
 
@@ -11,6 +11,13 @@ def is_fp_closed(obj):
     :param obj:
         The file-like object to check.
     """
+
+    try:
+        # Check `isclosed()` first, in case Python3 doesn't set `closed`.
+        # GH Issue #928
+        return obj.isclosed()
+    except AttributeError:
+        pass
 
     try:
         # Check via the official file-like-object way.
@@ -45,15 +52,20 @@ def assert_header_parsing(headers):
     # This will fail silently if we pass in the wrong kind of parameter.
     # To make debugging easier add an explicit check.
     if not isinstance(headers, httplib.HTTPMessage):
-        raise TypeError('expected httplib.Message, got {0}.'.format(
-            type(headers)))
+        raise TypeError("expected httplib.Message, got {0}.".format(type(headers)))
 
-    defects = getattr(headers, 'defects', None)
-    get_payload = getattr(headers, 'get_payload', None)
+    defects = getattr(headers, "defects", None)
+    get_payload = getattr(headers, "get_payload", None)
 
     unparsed_data = None
-    if get_payload:  # Platform-specific: Python 3.
-        unparsed_data = get_payload()
+    if get_payload:
+        # get_payload is actually email.message.Message.get_payload;
+        # we're only interested in the result if it's not a multipart message
+        if not headers.is_multipart():
+            payload = get_payload()
+
+            if isinstance(payload, (bytes, str)):
+                unparsed_data = payload
 
     if defects or unparsed_data:
         raise HeaderParsingError(defects=defects, unparsed_data=unparsed_data)
@@ -61,7 +73,7 @@ def assert_header_parsing(headers):
 
 def is_response_to_head(response):
     """
-    Checks, wether a the request of a response has been a HEAD-request.
+    Checks whether the request of a response has been a HEAD-request.
     Handles the quirks of AppEngine.
 
     :param conn:
@@ -71,4 +83,4 @@ def is_response_to_head(response):
     method = response._method
     if isinstance(method, int):  # Platform-specific: Appengine
         return method == 3
-    return method.upper() == 'HEAD'
+    return method.upper() == "HEAD"

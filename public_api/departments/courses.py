@@ -1,4 +1,3 @@
-import json
 import helpers.functions as fnc
 import helpers.tables as tbl
 import helpers.errors as err
@@ -10,7 +9,8 @@ def Handler(event, context):
 def GetDepartmentCourses(dept):
     try:
         deptTable = fnc.GetDataTable(tbl.DEPTS)
-        res = deptTable.get_item(Key={ 'DepartmentName': dept },
+        res = deptTable.get_item(
+            Key={'DepartmentName': dept},
             ProjectionExpression="Courses"
         )
     except:

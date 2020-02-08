@@ -1,5 +1,11 @@
+import sys
+
 try:
-    # Python 3.2+
+    # Our match_hostname function is the same as 3.5's, so we only want to
+    # import the match_hostname function if it's at least that good.
+    if sys.version_info < (3, 5):
+        raise ImportError("Fallback to vendored code")
+
     from ssl import CertificateError, match_hostname
 except ImportError:
     try:
@@ -10,4 +16,4 @@ except ImportError:
         from ._implementation import CertificateError, match_hostname
 
 # Not needed, but documenting what we provide.
-__all__ = ('CertificateError', 'match_hostname')
+__all__ = ("CertificateError", "match_hostname")
