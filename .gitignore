@@ -27,3 +27,5 @@ urllib3
 passlib
 
 *__pycache__
+
+.idea
